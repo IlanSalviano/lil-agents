@@ -867,28 +867,34 @@ class WalkerCharacter {
         let referenceWidth: CGFloat = 500.0
         let walkPixels = CGFloat.random(in: walkAmountRange) * referenceWidth
         let walkAmount = currentTravelDistance > 0 ? walkPixels / currentTravelDistance : 0.3
-        if goingRight {
-            walkEndPos = min(walkStartPos + walkAmount, 1.0)
-        } else {
-            walkEndPos = max(walkStartPos - walkAmount, 0.0)
+
+        // Target for a direction, pulled up short of any sibling standing in the way.
+        let minSeparation: CGFloat = 0.12
+        func target(goingRight direction: Bool) -> CGFloat {
+            var end = direction ? min(walkStartPos + walkAmount, 1.0)
+                                : max(walkStartPos - walkAmount, 0.0)
+            for sibling in controller?.characters ?? [] where sibling !== self {
+                let sibPos = sibling.positionProgress
+                guard abs(end - sibPos) < minSeparation else { continue }
+                end = direction ? max(walkStartPos, sibPos - minSeparation)
+                                : min(walkStartPos, sibPos + minSeparation)
+            }
+            return end
         }
+
+        walkEndPos = target(goingRight: goingRight)
+        // Boxed in on this side — turn around instead of walking in place.
+        if abs(walkEndPos - walkStartPos) < 0.01 {
+            let flipped = target(goingRight: !goingRight)
+            if abs(flipped - walkStartPos) > abs(walkEndPos - walkStartPos) {
+                goingRight = !goingRight
+                walkEndPos = flipped
+            }
+        }
+
         // Store pixel positions so walk speed stays consistent if screen changes mid-walk
         walkStartPixel = walkStartPos * currentTravelDistance
         walkEndPixel = walkEndPos * currentTravelDistance
-
-        let minSeparation: CGFloat = 0.12
-        if let siblings = controller?.characters {
-            for sibling in siblings where sibling !== self {
-                let sibPos = sibling.positionProgress
-                if abs(walkEndPos - sibPos) < minSeparation {
-                    if goingRight {
-                        walkEndPos = max(walkStartPos, sibPos - minSeparation)
-                    } else {
-                        walkEndPos = min(walkStartPos, sibPos + minSeparation)
-                    }
-                }
-            }
-        }
 
         updateFlip()
         queuePlayer.seek(to: .zero)

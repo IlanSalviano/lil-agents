@@ -103,7 +103,15 @@ class LilAgentsController {
 
     private func getDockIconArea(screenWidth: CGFloat) -> (x: CGFloat, width: CGFloat) {
         let dockDefaults = UserDefaults(suiteName: "com.apple.dock")
-        let tileSize = CGFloat(dockDefaults?.double(forKey: "tilesize") ?? 48)
+
+        // `double(forKey:)` and `bool(forKey:)` return 0/false for an absent key rather
+        // than nil, so `?? default` never fires. The Dock only writes these keys once the
+        // user changes the setting, so on a stock Dock they are missing — read the raw
+        // object and fall back to the macOS defaults explicitly.
+        let tileSize: CGFloat = {
+            guard let raw = dockDefaults?.object(forKey: "tilesize") as? Double, raw > 0 else { return 48 }
+            return CGFloat(raw)
+        }()
         let slotWidth = tileSize * 1.25
 
         var persistentApps = dockDefaults?.array(forKey: "persistent-apps")?.count ?? 0
@@ -115,7 +123,7 @@ class LilAgentsController {
             persistentOthers = 3
         }
 
-        let showRecents = dockDefaults?.bool(forKey: "show-recents") ?? true
+        let showRecents = (dockDefaults?.object(forKey: "show-recents") as? Bool) ?? true
         let recentApps = showRecents ? (dockDefaults?.array(forKey: "recent-apps")?.count ?? 0) : 0
         let totalIcons = persistentApps + persistentOthers + recentApps
 
@@ -129,6 +137,11 @@ class LilAgentsController {
 
         // Small fudge factor for dock edge padding
         dockWidth *= 1.15
+
+        // macOS shrinks tiles to keep the Dock on screen rather than letting it overflow,
+        // so a large icon count must not push the walk range past the display edges.
+        dockWidth = min(dockWidth, screenWidth * 0.95)
+
         let dockX = (screenWidth - dockWidth) / 2.0
         return (dockX, dockWidth)
     }
