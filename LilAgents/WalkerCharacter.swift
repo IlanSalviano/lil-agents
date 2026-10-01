@@ -19,6 +19,17 @@ enum CharacterSize: String, CaseIterable {
     }
 }
 
+/// One-shot special attack clip (e.g. Thunder Breathing forms).
+struct SpecialMove {
+    var videoName: String
+    /// Total clip length used for finish timing.
+    var duration: CFTimeInterval?
+    /// When during the clip the character snaps to the end position.
+    var dashAt: CFTimeInterval?
+    var travelRange: ClosedRange<CGFloat>?
+    var sizeScale: CGFloat?
+}
+
 class WalkerCharacter {
     let videoName: String
     let name: String
@@ -77,6 +88,39 @@ class WalkerCharacter {
     var walkStartPixel: CGFloat = 0.0
     var walkEndPixel: CGFloat = 0.0
 
+    // Special moves (e.g. Thunder Breath, Flaming Thunder God) — one-shot videos + position snap
+    /// Prefer `specialMoves`; `specialVideoName` is a convenience for a single special.
+    var specialMoves: [SpecialMove] = []
+    var specialVideoName: String? {
+        get { specialMoves.first?.videoName }
+        set {
+            guard let name = newValue, !name.isEmpty else {
+                specialMoves = []
+                return
+            }
+            if specialMoves.isEmpty {
+                specialMoves = [SpecialMove(videoName: name)]
+            } else {
+                specialMoves[0].videoName = name
+            }
+        }
+    }
+    var specialChance: Double = 0
+    var specialDuration: CFTimeInterval = 2.5
+    /// Elapsed time in the special clip when the character blinks to the end position.
+    var specialDashAt: CFTimeInterval = 0.7
+    var specialTravelRange: ClosedRange<CGFloat> = 0.45...0.85
+    /// Default window scale while a special plays (overridable per `SpecialMove.sizeScale`).
+    var specialSizeScale: CGFloat = 1.0
+    var isPlayingSpecial = false
+    private var specialStartTime: CFTimeInterval = 0
+    private var specialHasDashed = false
+    private var isSpecialPresentationActive = false
+    /// Active special timing / scale (copied from the chosen move when it starts).
+    private var activeSpecialDuration: CFTimeInterval = 2.5
+    private var activeSpecialDashAt: CFTimeInterval = 0.7
+    private var activeSpecialSizeScale: CGFloat = 1.0
+
     // Onboarding
     var isOnboarding = false
 
@@ -106,26 +150,53 @@ class WalkerCharacter {
     // MARK: - Setup
 
     func updateDimensions() {
-        displayHeight = size.height
-        let newWidth = displayWidth
-        let newHeight = displayHeight
-        
+        // Keep special enlarged presentation if a special is mid-play.
+        let scale = isSpecialPresentationActive ? max(activeSpecialSizeScale, 1.0) : 1.0
+        displayHeight = size.height * scale
+        applyWindowSize(width: displayWidth, height: displayHeight, expandUpward: scale > 1.0)
+    }
+
+    /// Resize the character window. When `expandUpward` is true, extra height grows above the dock
+    /// so feet stay put while special FX get more room.
+    private func applyWindowSize(width: CGFloat, height: CGFloat, expandUpward: Bool) {
         DispatchQueue.main.async { [weak self] in
             guard let self = self, let window = self.window else { return }
-            let oldFrame = window.frame
-            let newFrame = CGRect(x: oldFrame.origin.x, y: oldFrame.origin.y, width: newWidth, height: newHeight)
-            
+            let old = window.frame
+            var origin = old.origin
+            if expandUpward {
+                // AppKit y is bottom edge — same origin grows upward.
+                origin.y = old.origin.y
+                // Center horizontally around previous center so the character doesn't jump sideways.
+                let oldCenterX = old.origin.x + old.width / 2
+                origin.x = oldCenterX - width / 2
+            }
+            let newFrame = CGRect(x: origin.x, y: origin.y, width: width, height: height)
+
             CATransaction.begin()
             CATransaction.setDisableActions(true)
             window.setFrame(newFrame, display: true)
-            self.playerLayer.frame = CGRect(x: 0, y: 0, width: newWidth, height: newHeight)
+            self.playerLayer.frame = CGRect(x: 0, y: 0, width: width, height: height)
             if let hostView = window.contentView {
-                hostView.frame = CGRect(x: 0, y: 0, width: newWidth, height: newHeight)
+                hostView.frame = CGRect(x: 0, y: 0, width: width, height: height)
             }
             CATransaction.commit()
-            
+
             self.updateFlip()
         }
+    }
+
+    private func setSpecialPresentation(_ active: Bool) {
+        let scale = active ? max(activeSpecialSizeScale, 1.0) : 1.0
+        // Always leave special presentation when deactivating; enlarge only when scale > 1.
+        if active && scale <= 1.001 {
+            isSpecialPresentationActive = false
+            displayHeight = size.height
+            applyWindowSize(width: displayWidth, height: displayHeight, expandUpward: false)
+            return
+        }
+        isSpecialPresentationActive = active
+        displayHeight = size.height * scale
+        applyWindowSize(width: displayWidth, height: displayHeight, expandUpward: active)
     }
 
     func setup() {
@@ -214,7 +285,7 @@ class WalkerCharacter {
         guard isManuallyVisible else { return }
 
         window.orderFrontRegardless()
-        if isWalking {
+        if isWalking || isPlayingSpecial {
             queuePlayer.play()
         }
 
@@ -250,6 +321,10 @@ class WalkerCharacter {
         showingCompletion = false
         hideBubble()
 
+        if isPlayingSpecial {
+            finishSpecial(restoreWalk: true)
+        }
+
         isIdleForPopover = true
         isWalking = false
         isPaused = true
@@ -264,9 +339,9 @@ class WalkerCharacter {
         terminalView?.inputField.isEditable = false
         terminalView?.inputField.placeholderString = ""
         let welcome = """
-        hey! we're bruce and jazz — your lil dock agents.
+        hey! we're bruce, jazz, and zenitsu — your lil dock agents.
 
-        click either of us to open a Claude AI chat. we'll walk around while you work and let you know when Claude's thinking.
+        click any of us to open a Claude AI chat. we'll walk around while you work and let you know when Claude's thinking.
 
         check the menu bar icon (top right) for themes, sounds, and more options.
 
@@ -308,6 +383,10 @@ class WalkerCharacter {
             for sibling in siblings where sibling !== self && sibling.isIdleForPopover {
                 sibling.closePopover()
             }
+        }
+
+        if isPlayingSpecial {
+            finishSpecial(restoreWalk: true)
         }
 
         isIdleForPopover = true
@@ -848,9 +927,21 @@ class WalkerCharacter {
 
     // MARK: - Walking
 
+    /// Called when a pause ends — either a normal walk or a special move.
+    func beginMovement() {
+        if !specialMoves.isEmpty,
+           specialChance > 0,
+           Double.random(in: 0..<1) < specialChance {
+            startSpecial()
+        } else {
+            startWalk()
+        }
+    }
+
     func startWalk() {
         isPaused = false
         isWalking = true
+        isPlayingSpecial = false
         playCount = 0
         walkStartTime = CACurrentMediaTime()
 
@@ -864,50 +955,159 @@ class WalkerCharacter {
 
         walkStartPos = positionProgress
         // Walk a fixed pixel distance (~200-325px) regardless of screen width.
+        // Use a safe travel distance so we never bake start==end pixels (which freezes dock X).
+        let travel = max(currentTravelDistance, 1)
         let referenceWidth: CGFloat = 500.0
         let walkPixels = CGFloat.random(in: walkAmountRange) * referenceWidth
-        let walkAmount = currentTravelDistance > 0 ? walkPixels / currentTravelDistance : 0.3
+        let walkAmount = walkPixels / travel
 
-        // Target for a direction, pulled up short of any sibling standing in the way.
-        let minSeparation: CGFloat = 0.12
-        func target(goingRight direction: Bool) -> CGFloat {
-            var end = direction ? min(walkStartPos + walkAmount, 1.0)
-                                : max(walkStartPos - walkAmount, 0.0)
-            for sibling in controller?.characters ?? [] where sibling !== self {
-                let sibPos = sibling.positionProgress
-                guard abs(end - sibPos) < minSeparation else { continue }
-                end = direction ? max(walkStartPos, sibPos - minSeparation)
-                                : min(walkStartPos, sibPos + minSeparation)
-            }
-            return end
-        }
-
-        walkEndPos = target(goingRight: goingRight)
-        // Boxed in on this side — turn around instead of walking in place.
+        walkEndPos = targetPosition(from: walkStartPos, amount: walkAmount, preferRight: goingRight)
         if abs(walkEndPos - walkStartPos) < 0.01 {
-            let flipped = target(goingRight: !goingRight)
+            let flipped = targetPosition(from: walkStartPos, amount: walkAmount, preferRight: !goingRight)
             if abs(flipped - walkStartPos) > abs(walkEndPos - walkStartPos) {
                 goingRight = !goingRight
                 walkEndPos = flipped
             }
         }
+        // Guarantee a visible dock slide even when siblings squeeze the path.
+        if abs(walkEndPos - walkStartPos) * travel < 60 {
+            let dir: CGFloat = goingRight ? 1 : -1
+            walkEndPos = min(max(walkStartPos + dir * min(0.12, walkAmount), 0), 1)
+            if abs(walkEndPos - walkStartPos) * travel < 40 {
+                goingRight.toggle()
+                let dir2: CGFloat = goingRight ? 1 : -1
+                walkEndPos = min(max(walkStartPos + dir2 * 0.12, 0), 1)
+            }
+        }
 
         // Store pixel positions so walk speed stays consistent if screen changes mid-walk
-        walkStartPixel = walkStartPos * currentTravelDistance
-        walkEndPixel = walkEndPos * currentTravelDistance
+        walkStartPixel = walkStartPos * travel
+        walkEndPixel = walkEndPos * travel
 
         updateFlip()
-        queuePlayer.seek(to: .zero)
-        queuePlayer.play()
+        // Always leave special presentation before a normal walk.
+        setSpecialPresentation(false)
+        ensureWalkLooperPlaying()
     }
 
     func enterPause() {
         isWalking = false
+        isPlayingSpecial = false
         isPaused = true
         queuePlayer.pause()
         queuePlayer.seek(to: .zero)
         let delay = Double.random(in: 5.0...12.0)
         pauseEndTime = CACurrentMediaTime() + delay
+    }
+
+    // MARK: - Special Move
+
+    func startSpecial() {
+        // Pick a random special whose video is present in the bundle.
+        let available = specialMoves.compactMap { move -> (SpecialMove, URL)? in
+            guard let url = Bundle.main.url(forResource: move.videoName, withExtension: "mov") else {
+                return nil
+            }
+            return (move, url)
+        }
+        guard let (move, specialURL) = available.randomElement() else {
+            startWalk()
+            return
+        }
+
+        activeSpecialDuration = move.duration ?? specialDuration
+        activeSpecialDashAt = move.dashAt ?? specialDashAt
+        activeSpecialSizeScale = move.sizeScale ?? specialSizeScale
+        let travelRange = move.travelRange ?? specialTravelRange
+
+        isPaused = false
+        isWalking = false
+        isPlayingSpecial = true
+        specialHasDashed = false
+        specialStartTime = CACurrentMediaTime()
+
+        if positionProgress > 0.7 {
+            goingRight = false
+        } else if positionProgress < 0.3 {
+            goingRight = true
+        } else {
+            goingRight = Bool.random()
+        }
+
+        walkStartPos = positionProgress
+        let travel = CGFloat.random(in: travelRange)
+        walkEndPos = targetPosition(from: walkStartPos, amount: travel, preferRight: goingRight)
+        if abs(walkEndPos - walkStartPos) < 0.08 {
+            let flipped = targetPosition(from: walkStartPos, amount: travel, preferRight: !goingRight)
+            if abs(flipped - walkStartPos) > abs(walkEndPos - walkStartPos) {
+                goingRight = !goingRight
+                walkEndPos = flipped
+            }
+        }
+        walkStartPixel = walkStartPos * currentTravelDistance
+        walkEndPixel = walkEndPos * currentTravelDistance
+
+        updateFlip()
+        setSpecialPresentation(true)
+        playOneShot(url: specialURL)
+    }
+
+    private func finishSpecial(restoreWalk: Bool) {
+        isPlayingSpecial = false
+        specialHasDashed = false
+        // Land at destination even if cancelled mid-anticipation
+        positionProgress = walkEndPos
+        setSpecialPresentation(false)
+        if restoreWalk {
+            restoreWalkLooper(paused: true)
+        }
+    }
+
+    private func playOneShot(url: URL) {
+        looper?.disableLooping()
+        looper = nil
+        queuePlayer.removeAllItems()
+        let item = AVPlayerItem(url: url)
+        queuePlayer.insert(item, after: nil)
+        queuePlayer.seek(to: .zero)
+        queuePlayer.play()
+    }
+
+    private func restoreWalkLooper(paused: Bool) {
+        looper?.disableLooping()
+        looper = nil
+        queuePlayer.removeAllItems()
+        guard let videoURL = Bundle.main.url(forResource: videoName, withExtension: "mov") else { return }
+        let asset = AVAsset(url: videoURL)
+        looper = AVPlayerLooper(player: queuePlayer, templateItem: AVPlayerItem(asset: asset))
+        queuePlayer.seek(to: .zero)
+        if paused {
+            queuePlayer.pause()
+        } else {
+            queuePlayer.play()
+        }
+    }
+
+    private func ensureWalkLooperPlaying() {
+        if looper == nil {
+            restoreWalkLooper(paused: false)
+        } else {
+            queuePlayer.seek(to: .zero)
+            queuePlayer.play()
+        }
+    }
+
+    /// Shared pathfinding toward a dock progress target, avoiding siblings.
+    private func targetPosition(from start: CGFloat, amount: CGFloat, preferRight: Bool) -> CGFloat {
+        let minSeparation: CGFloat = 0.12
+        var end = preferRight ? min(start + amount, 1.0) : max(start - amount, 0.0)
+        for sibling in controller?.characters ?? [] where sibling !== self {
+            let sibPos = sibling.positionProgress
+            guard abs(end - sibPos) < minSeparation else { continue }
+            end = preferRight ? max(start, sibPos - minSeparation)
+                              : min(start, sibPos + minSeparation)
+        }
+        return end
     }
 
     func updateFlip() {
@@ -954,7 +1154,10 @@ class WalkerCharacter {
     // MARK: - Frame Update
 
     func update(dockX: CGFloat, dockWidth: CGFloat, dockTopY: CGFloat) {
-        currentTravelDistance = max(dockWidth - displayWidth, 0)
+        // Always use the normal (walk) width for path math so enlarging the special window
+        // doesn't compress dock travel distance mid-animation.
+        let baseWidth = size.height * (videoWidth / videoHeight)
+        currentTravelDistance = max(dockWidth - baseWidth, 0)
         if isIdleForPopover {
             let travelDistance = currentTravelDistance
             let x = dockX + travelDistance * positionProgress + currentFlipCompensation
@@ -970,43 +1173,85 @@ class WalkerCharacter {
 
         if isPaused {
             if now >= pauseEndTime {
-                startWalk()
+                beginMovement()
             } else {
-                let travelDistance = max(dockWidth - displayWidth, 0)
-                let x = dockX + travelDistance * positionProgress + currentFlipCompensation
-                let bottomPadding = displayHeight * 0.15
-                let y = dockTopY - bottomPadding + yOffset
-                window.setFrameOrigin(NSPoint(x: x, y: y))
+                placeWindow(dockX: dockX, dockTopY: dockTopY)
                 return
             }
+        }
+
+        if isPlayingSpecial {
+            let elapsed = now - specialStartTime
+            if !specialHasDashed && elapsed >= activeSpecialDashAt {
+                specialHasDashed = true
+                positionProgress = walkEndPos
+            }
+            if elapsed >= activeSpecialDuration {
+                finishSpecial(restoreWalk: true)
+                enterPause()
+                placeWindow(dockX: dockX, dockTopY: dockTopY)
+                updateThinkingBubble()
+                return
+            }
+            placeWindow(dockX: dockX, dockTopY: dockTopY)
+            updateThinkingBubble()
+            return
         }
 
         if isWalking {
             let elapsed = now - walkStartTime
             let videoTime = min(elapsed, videoDuration)
-            let travelDistance = currentTravelDistance
-
-            // Interpolate in pixel space for consistent speed across screen changes
             let walkNorm = elapsed >= videoDuration ? 1.0 : movementPosition(at: videoTime)
-            let currentPixel = walkStartPixel + (walkEndPixel - walkStartPixel) * walkNorm
 
-            // Convert pixel position back to progress for the current screen
-            if travelDistance > 0 {
+            // Drive dock X from planned progress endpoints (most reliable).
+            // Pixel endpoints are kept for debugging / future multi-screen remaps.
+            if abs(walkEndPos - walkStartPos) > 0.0001 {
+                positionProgress = min(max(walkStartPos + (walkEndPos - walkStartPos) * walkNorm, 0), 1)
+            } else {
+                let travelDistance = max(currentTravelDistance, 1)
+                let currentPixel = walkStartPixel + (walkEndPixel - walkStartPixel) * walkNorm
                 positionProgress = min(max(currentPixel / travelDistance, 0), 1)
             }
 
             if elapsed >= videoDuration {
                 walkEndPos = positionProgress
                 enterPause()
+                placeWindow(dockX: dockX, dockTopY: dockTopY)
+                updateThinkingBubble()
                 return
             }
 
-            let x = dockX + travelDistance * positionProgress + currentFlipCompensation
-            let bottomPadding = displayHeight * 0.15
-            let y = dockTopY - bottomPadding + yOffset
-            window.setFrameOrigin(NSPoint(x: x, y: y))
+            placeWindow(dockX: dockX, dockTopY: dockTopY)
         }
 
         updateThinkingBubble()
+    }
+
+    private func placeWindow(dockX: CGFloat, dockTopY: CGFloat) {
+        let travelDistance = currentTravelDistance
+        // Anchor feet using the normal (non-special) height so enlarging the special window
+        // grows upward/outward without floating the character above the Dock.
+        let baseHeight = size.height
+        let baseWidth = baseHeight * (videoWidth / videoHeight)
+        // Walk clips have ~15% empty padding under the feet (297/1920). Keep that constant
+        // for both walk and special so soles stay on the dock line.
+        let feetPadFraction: CGFloat = 297.0 / 1920.0
+        let bottomPadding = baseHeight * feetPadFraction
+        var y = dockTopY - bottomPadding + yOffset
+
+        // If the special window is scaled up, feet would rise with the larger frame.
+        // Nudge the window down by the extra scaled pad so feet stay dock-level.
+        if isSpecialPresentationActive, activeSpecialSizeScale > 1.001 {
+            let extraPad = baseHeight * feetPadFraction * (activeSpecialSizeScale - 1.0)
+            y -= extraPad
+        }
+
+        // Base position (same as walk). When special window is wider, shift left so the
+        // character stays centered under the same dock point — without breaking walk X.
+        var x = dockX + travelDistance * positionProgress + currentFlipCompensation
+        if displayWidth > baseWidth + 0.5 {
+            x -= (displayWidth - baseWidth) / 2
+        }
+        window.setFrameOrigin(NSPoint(x: x, y: y))
     }
 }

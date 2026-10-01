@@ -37,13 +37,15 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 
         let menu = NSMenu()
 
-        let char1Item = NSMenuItem(title: "Bruce", action: #selector(toggleChar1), keyEquivalent: "1")
-        char1Item.state = .on
-        menu.addItem(char1Item)
-
-        let char2Item = NSMenuItem(title: "Jazz", action: #selector(toggleChar2), keyEquivalent: "2")
-        char2Item.state = .on
-        menu.addItem(char2Item)
+        if let chars = controller?.characters {
+            for (i, char) in chars.enumerated() {
+                let key = i < 9 ? "\(i + 1)" : ""
+                let item = NSMenuItem(title: char.name, action: #selector(toggleCharacter(_:)), keyEquivalent: key)
+                item.tag = i
+                item.state = char.isManuallyVisible ? .on : .off
+                menu.addItem(item)
+            }
+        }
 
         menu.addItem(NSMenuItem.separator())
 
@@ -215,28 +217,12 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         }
     }
 
-    @objc func toggleChar1(_ sender: NSMenuItem) {
-        guard let chars = controller?.characters, chars.count > 0 else { return }
-        let char = chars[0]
-        if char.isManuallyVisible {
-            char.setManuallyVisible(false)
-            sender.state = .off
-        } else {
-            char.setManuallyVisible(true)
-            sender.state = .on
-        }
-    }
-
-    @objc func toggleChar2(_ sender: NSMenuItem) {
-        guard let chars = controller?.characters, chars.count > 1 else { return }
-        let char = chars[1]
-        if char.isManuallyVisible {
-            char.setManuallyVisible(false)
-            sender.state = .off
-        } else {
-            char.setManuallyVisible(true)
-            sender.state = .on
-        }
+    @objc func toggleCharacter(_ sender: NSMenuItem) {
+        guard let chars = controller?.characters, sender.tag >= 0, sender.tag < chars.count else { return }
+        let char = chars[sender.tag]
+        let visible = !char.isManuallyVisible
+        char.setManuallyVisible(visible)
+        sender.state = visible ? .on : .off
     }
 
     @objc func toggleSounds(_ sender: NSMenuItem) {

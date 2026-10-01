@@ -11,14 +11,16 @@ class LilAgentsController {
     func start() {
         let char1 = WalkerCharacter(videoName: "walk-bruce-01", name: "Bruce")
         let char2 = WalkerCharacter(videoName: "walk-jazz-01", name: "Jazz")
+        let char3 = WalkerCharacter(videoName: "walk-zenitsu-01", name: "Zenitsu")
 
         // Detect available providers, then set first-run defaults
-        AgentProvider.detectAvailableProviders { [weak char1, weak char2] in
-            guard let char1 = char1, let char2 = char2 else { return }
+        AgentProvider.detectAvailableProviders { [weak char1, weak char2, weak char3] in
+            guard let char1 = char1, let char2 = char2, let char3 = char3 else { return }
             if !UserDefaults.standard.bool(forKey: Self.onboardingKey) {
                 let first = AgentProvider.firstAvailable
                 char1.provider = first
                 char2.provider = first
+                char3.provider = first
             }
         }
 
@@ -33,24 +35,53 @@ class LilAgentsController {
         char2.decelStart = 8.0
         char2.walkStop = 8.75
         char2.walkAmountRange = 0.35...0.6
+
+        // Continuous walk: first real step ~4.0s, walk through ~8.0s, idle after
+        char3.accelStart = 4.0
+        char3.fullSpeedStart = 4.5
+        char3.decelStart = 7.75
+        char3.walkStop = 8.5
+        char3.walkAmountRange = 0.4...0.65
+        // Thunder Breathing specials — random pick each time specialChance fires
+        char3.specialMoves = [
+            // Classic thunder: content padded small; enlarge window so FX read at dock size.
+            SpecialMove(videoName: "special-zenitsu-thunder-01", sizeScale: 1.35),
+            // Seventh Form: Flaming Thunder God — content padded + hard outer safe band;
+            // enlarge window so body stays readable on the dock.
+            SpecialMove(videoName: "special-zenitsu-flame-01", sizeScale: 1.85),
+        ]
+        char3.specialChance = 0.22
+        // Continuous 6s clips: charge → slash ~2.5s → recovery
+        char3.specialDuration = 6.0
+        char3.specialDashAt = 2.5
+        char3.specialTravelRange = 0.45...0.85
+        char3.specialSizeScale = 1.35
+
         char1.yOffset = -3
         char2.yOffset = -7
+        // Feet baseline matches Bruce (~296px padding); slight nudge to sit on dock line
+        char3.yOffset = -4
         char1.characterColor = NSColor(red: 0.4, green: 0.72, blue: 0.55, alpha: 1.0)
         char2.characterColor = NSColor(red: 1.0, green: 0.4, blue: 0.0, alpha: 1.0)
+        char3.characterColor = NSColor(red: 1.0, green: 0.85, blue: 0.15, alpha: 1.0)
 
         char1.flipXOffset = 0
         char2.flipXOffset = -9
+        char3.flipXOffset = 0
 
-        char1.positionProgress = 0.3
-        char2.positionProgress = 0.7
+        char1.positionProgress = 0.2
+        char2.positionProgress = 0.55
+        char3.positionProgress = 0.85
 
         char1.pauseEndTime = CACurrentMediaTime() + Double.random(in: 0.5...2.0)
         char2.pauseEndTime = CACurrentMediaTime() + Double.random(in: 8.0...14.0)
+        char3.pauseEndTime = CACurrentMediaTime() + Double.random(in: 3.0...7.0)
 
         char1.setup()
         char2.setup()
+        char3.setup()
 
-        characters = [char1, char2]
+        characters = [char1, char2, char3]
         characters.forEach { $0.controller = self }
 
         setupDebugLine()
@@ -244,10 +275,10 @@ class LilAgentsController {
         let activeChars = characters.filter { $0.window.isVisible && $0.isManuallyVisible }
 
         let now = CACurrentMediaTime()
-        let anyWalking = activeChars.contains { $0.isWalking }
+        let anyBusy = activeChars.contains { $0.isWalking || $0.isPlayingSpecial }
         for char in activeChars {
             if char.isIdleForPopover { continue }
-            if char.isPaused && now >= char.pauseEndTime && anyWalking {
+            if char.isPaused && now >= char.pauseEndTime && anyBusy {
                 char.pauseEndTime = now + Double.random(in: 5.0...10.0)
             }
         }
