@@ -30,6 +30,13 @@
 		A10000010000000000000036 /* OpenCodeSession.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000020000000000000035 /* OpenCodeSession.swift */; };
 		A10000010000000000000037 /* DockVisibility.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000020000000000000036 /* DockVisibility.swift */; };
 		A10000010000000000000038 /* OpenClawSession.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000020000000000000037 /* OpenClawSession.swift */; };
+		A10000010000000000000039 /* CharacterAnimationLayout.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000020000000000000038 /* CharacterAnimationLayout.swift */; };
+		A10000010000000000000040 /* zenitsu-animation-layouts.json in Resources */ = {isa = PBXBuildFile; fileRef = A10000020000000000000039 /* zenitsu-animation-layouts.json */; };
+		A10000010000000000000041 /* CharacterPersonality.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000020000000000000041 /* CharacterPersonality.swift */; };
+		A10000010000000000000042 /* walk-inosuke-01.mov in Resources */ = {isa = PBXBuildFile; fileRef = A10000020000000000000042 /* walk-inosuke-01.mov */; };
+		A10000010000000000000043 /* special-inosuke-cross-01.mov in Resources */ = {isa = PBXBuildFile; fileRef = A10000020000000000000043 /* special-inosuke-cross-01.mov */; };
+		A10000010000000000000044 /* special-inosuke-rush-01.mov in Resources */ = {isa = PBXBuildFile; fileRef = A10000020000000000000044 /* special-inosuke-rush-01.mov */; };
+		A10000010000000000000045 /* inosuke-animation-layouts.json in Resources */ = {isa = PBXBuildFile; fileRef = A10000020000000000000045 /* inosuke-animation-layouts.json */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -58,6 +65,13 @@
 		A10000020000000000000036 /* DockVisibility.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DockVisibility.swift; sourceTree = "<group>"; };
 		A10000020000000000000037 /* OpenClawSession.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OpenClawSession.swift; sourceTree = "<group>"; };
 		A10000030000000000000001 /* lil agents.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "lil agents.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		A10000020000000000000038 /* CharacterAnimationLayout.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CharacterAnimationLayout.swift; sourceTree = "<group>"; };
+		A10000020000000000000039 /* zenitsu-animation-layouts.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = "zenitsu-animation-layouts.json"; sourceTree = "<group>"; };
+		A10000020000000000000041 /* CharacterPersonality.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "CharacterPersonality.swift"; sourceTree = "<group>"; };
+		A10000020000000000000042 /* walk-inosuke-01.mov */ = {isa = PBXFileReference; lastKnownFileType = video.quicktime; path = "walk-inosuke-01.mov"; sourceTree = "<group>"; };
+		A10000020000000000000043 /* special-inosuke-cross-01.mov */ = {isa = PBXFileReference; lastKnownFileType = video.quicktime; path = "special-inosuke-cross-01.mov"; sourceTree = "<group>"; };
+		A10000020000000000000044 /* special-inosuke-rush-01.mov */ = {isa = PBXFileReference; lastKnownFileType = video.quicktime; path = "special-inosuke-rush-01.mov"; sourceTree = "<group>"; };
+		A10000020000000000000045 /* inosuke-animation-layouts.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = "inosuke-animation-layouts.json"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -97,6 +111,13 @@
 				A10000020000000000000036 /* DockVisibility.swift */,
 				A10000020000000000000023 /* TerminalView.swift */,
 				A10000020000000000000024 /* WalkerCharacter.swift */,
+				A10000020000000000000038 /* CharacterAnimationLayout.swift */,
+				A10000020000000000000039 /* zenitsu-animation-layouts.json */,
+				A10000020000000000000041 /* CharacterPersonality.swift */,
+				A10000020000000000000042 /* walk-inosuke-01.mov */,
+				A10000020000000000000043 /* special-inosuke-cross-01.mov */,
+				A10000020000000000000044 /* special-inosuke-rush-01.mov */,
+				A10000020000000000000045 /* inosuke-animation-layouts.json */,
 				A10000020000000000000025 /* LilAgentsController.swift */,
 				A10000020000000000000002 /* walk-bruce-01.mov */,
 				A10000020000000000000005 /* walk-jazz-01.mov */,
@@ -183,11 +204,16 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				A10000010000000000000045 /* inosuke-animation-layouts.json in Resources */,
+				A10000010000000000000044 /* special-inosuke-rush-01.mov in Resources */,
+				A10000010000000000000043 /* special-inosuke-cross-01.mov in Resources */,
+				A10000010000000000000042 /* walk-inosuke-01.mov in Resources */,
 				A10000010000000000000002 /* walk-bruce-01.mov in Resources */,
 				A10000010000000000000003 /* walk-jazz-01.mov in Resources */,
 				A10000010000000000000004 /* walk-zenitsu-01.mov in Resources */,
 				A10000010000000000000006 /* special-zenitsu-thunder-01.mov in Resources */,
 				A10000010000000000000007 /* special-zenitsu-flame-01.mov in Resources */,
+				A10000010000000000000040 /* zenitsu-animation-layouts.json in Resources */,
 				A10000010000000000000005 /* Assets.xcassets in Resources */,
 				A10000010000000000000010 /* Sounds in Resources */,
 			);
@@ -200,6 +226,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				A10000010000000000000041 /* CharacterPersonality.swift in Sources */,
 				A10000010000000000000001 /* LilAgentsApp.swift in Sources */,
 				A10000010000000000000020 /* PopoverTheme.swift in Sources */,
 				A10000010000000000000021 /* CharacterContentView.swift in Sources */,
@@ -214,6 +241,7 @@
 				A10000010000000000000038 /* OpenClawSession.swift in Sources */,
 				A10000010000000000000023 /* TerminalView.swift in Sources */,
 				A10000010000000000000024 /* WalkerCharacter.swift in Sources */,
+				A10000010000000000000039 /* CharacterAnimationLayout.swift in Sources */,
 				A10000010000000000000025 /* LilAgentsController.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

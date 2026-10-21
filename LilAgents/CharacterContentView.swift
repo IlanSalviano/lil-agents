@@ -57,4 +57,17 @@ class CharacterContentView: NSView {
     override func mouseDown(with event: NSEvent) {
         character?.handleClick()
     }
+
+    override func menu(for event: NSEvent) -> NSMenu? {
+        guard let character, !character.specialMoves.isEmpty else { return nil }
+        let menu = NSMenu(title: character.name)
+        for (index, move) in character.specialMoves.enumerated() {
+            let item = NSMenuItem(title: move.title ?? "Special \(index + 1)",
+                                  action: #selector(WalkerCharacter.performSpecialFromMenu(_:)), keyEquivalent: "")
+            item.target = character
+            item.tag = index
+            menu.addItem(item)
+        }
+        return menu
+    }
 }

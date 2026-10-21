@@ -12,15 +12,20 @@ class LilAgentsController {
         let char1 = WalkerCharacter(videoName: "walk-bruce-01", name: "Bruce")
         let char2 = WalkerCharacter(videoName: "walk-jazz-01", name: "Jazz")
         let char3 = WalkerCharacter(videoName: "walk-zenitsu-01", name: "Zenitsu")
+        let char4 = WalkerCharacter(videoName: "walk-inosuke-01", name: "Inosuke")
 
         // Detect available providers, then set first-run defaults
-        AgentProvider.detectAvailableProviders { [weak char1, weak char2, weak char3] in
-            guard let char1 = char1, let char2 = char2, let char3 = char3 else { return }
+        AgentProvider.detectAvailableProviders { [weak char1, weak char2, weak char3, weak char4] in
+            guard let char1, let char2, let char3, let char4 else { return }
             if !UserDefaults.standard.bool(forKey: Self.onboardingKey) {
                 let first = AgentProvider.firstAvailable
                 char1.provider = first
                 char2.provider = first
                 char3.provider = first
+                char4.provider = first
+            }
+            if UserDefaults.standard.string(forKey: "InosukeProvider") == nil {
+                char4.provider = char1.provider.isAvailable ? char1.provider : AgentProvider.firstAvailable
             }
         }
 
@@ -44,23 +49,38 @@ class LilAgentsController {
         char3.walkAmountRange = 0.4...0.65
         // Thunder Breathing specials — random pick each time specialChance fires
         char3.specialMoves = [
-            // Classic thunder: content padded small; enlarge window so FX read at dock size.
-            SpecialMove(videoName: "special-zenitsu-thunder-01", sizeScale: 1.35),
-            // Seventh Form: Flaming Thunder God — content padded + hard outer safe band;
-            // enlarge window so body stays readable on the dock.
-            SpecialMove(videoName: "special-zenitsu-flame-01", sizeScale: 1.85),
+            SpecialMove(videoName: "special-zenitsu-thunder-01"),
+            SpecialMove(videoName: "special-zenitsu-flame-01"),
         ]
         char3.specialChance = 0.22
         // Continuous 6s clips: charge → slash ~2.5s → recovery
         char3.specialDuration = 6.0
         char3.specialDashAt = 2.5
         char3.specialTravelRange = 0.45...0.85
-        char3.specialSizeScale = 1.35
+
+        char4.personality = .inosuke
+        char4.accelStart = 2.0
+        char4.fullSpeedStart = 2.5
+        char4.decelStart = 7.0
+        char4.walkStop = 7.8
+        char4.walkAmountRange = 0.45...0.7
+        char4.specialMoves = [
+            SpecialMove(videoName: "special-inosuke-cross-01", duration: 6, dashAt: 2,
+                        travelRange: 0...0, title: "Presas cruzadas", battleCry: "Presas cruzadas!"),
+            SpecialMove(videoName: "special-inosuke-rush-01", duration: 10, dashAt: 1,
+                        travelRange: 0.35...0.65, travelDuration: 4.6,
+                        title: "Investida da fera", battleCry: "Sai da frente!"),
+        ]
+        char4.specialChance = 0.32
+        char4.characterColor = NSColor(red: 0.39, green: 0.70, blue: 0.86, alpha: 1)
+        if UserDefaults.standard.string(forKey: "InosukeSize") == nil {
+            char4.size = char1.size
+        }
 
         char1.yOffset = -3
         char2.yOffset = -7
-        // Feet baseline matches Bruce (~296px padding); slight nudge to sit on dock line
-        char3.yOffset = -4
+        // Zenitsu's per-frame sole measurements replace the fixed vertical nudge.
+        char3.yOffset = 0
         char1.characterColor = NSColor(red: 0.4, green: 0.72, blue: 0.55, alpha: 1.0)
         char2.characterColor = NSColor(red: 1.0, green: 0.4, blue: 0.0, alpha: 1.0)
         char3.characterColor = NSColor(red: 1.0, green: 0.85, blue: 0.15, alpha: 1.0)
@@ -72,16 +92,19 @@ class LilAgentsController {
         char1.positionProgress = 0.2
         char2.positionProgress = 0.55
         char3.positionProgress = 0.85
+        char4.positionProgress = 0.7
 
         char1.pauseEndTime = CACurrentMediaTime() + Double.random(in: 0.5...2.0)
         char2.pauseEndTime = CACurrentMediaTime() + Double.random(in: 8.0...14.0)
         char3.pauseEndTime = CACurrentMediaTime() + Double.random(in: 3.0...7.0)
+        char4.pauseEndTime = CACurrentMediaTime() + 1.0
 
         char1.setup()
         char2.setup()
         char3.setup()
+        char4.setup()
 
-        characters = [char1, char2, char3]
+        characters = [char1, char2, char3, char4]
         characters.forEach { $0.controller = self }
 
         setupDebugLine()
@@ -267,7 +290,9 @@ class LilAgentsController {
         let dockTopY: CGFloat
 
         // Dock is on this screen — constrain to dock area
-        (dockX, dockWidth) = getDockIconArea(screenWidth: screenWidth)
+        let iconArea = getDockIconArea(screenWidth: screenWidth)
+        dockX = screen.frame.minX + iconArea.x
+        dockWidth = iconArea.width
         dockTopY = screen.visibleFrame.origin.y
 
         updateDebugLine(dockX: dockX, dockWidth: dockWidth, dockTopY: dockTopY)

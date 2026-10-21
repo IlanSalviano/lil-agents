@@ -154,7 +154,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             if wasOpen {
                 char.createPopoverWindow()
                 if let session = char.session, !session.history.isEmpty {
-                    char.terminalView?.replayHistory(session.history)
+                    char.terminalView?.replayHistory(char.visibleHistory)
                 }
                 char.updatePopoverPosition()
                 char.popoverWindow?.orderFrontRegardless()
