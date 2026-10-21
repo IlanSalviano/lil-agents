@@ -1,8 +1,19 @@
 import AppKit
+import os
 
 class LilAgentsController {
     var characters: [WalkerCharacter] = []
     private var displayLink: CVDisplayLink?
+    /// The display link fires on its own thread at the display refresh rate. Only one
+    /// tick may be queued on main at a time; otherwise a stalled main thread (sleep/wake,
+    /// display reconfiguration, a slow frame) piles up blocks until the app runs out of memory.
+    private let tickPending = OSAllocatedUnfairLock(initialState: false)
+    private var lifecycleObservers: [(NotificationCenter, NSObjectProtocol)] = []
+    private var cachedDockPrefs: DockPrefs?
+    private var dockPrefsReadAt: CFTimeInterval = 0
+    private static let dockPrefsRefreshInterval: CFTimeInterval = 2.0
+    /// Characters shown at launch; the rest start hidden and can be enabled from the menu.
+    private static let visibleAtLaunch: Set<String> = ["Zenitsu", "Inosuke"]
     var debugWindow: NSWindow?
     var pinnedScreenIndex: Int = -1
     private static let onboardingKey = "hasCompletedOnboarding"
@@ -91,7 +102,7 @@ class LilAgentsController {
 
         char1.positionProgress = 0.2
         char2.positionProgress = 0.55
-        char3.positionProgress = 0.85
+        char3.positionProgress = 0.3
         char4.positionProgress = 0.7
 
         char1.pauseEndTime = CACurrentMediaTime() + Double.random(in: 0.5...2.0)
@@ -106,9 +117,13 @@ class LilAgentsController {
 
         characters = [char1, char2, char3, char4]
         characters.forEach { $0.controller = self }
+        for char in characters where !Self.visibleAtLaunch.contains(char.name) {
+            char.setManuallyVisible(false)
+        }
 
         setupDebugLine()
         startDisplayLink()
+        observeSystemLifecycle()
 
         if !UserDefaults.standard.bool(forKey: Self.onboardingKey) {
             triggerOnboarding()
@@ -116,7 +131,7 @@ class LilAgentsController {
     }
 
     private func triggerOnboarding() {
-        guard let bruce = characters.first else { return }
+        guard let bruce = characters.first(where: { $0.isManuallyVisible }) ?? characters.first else { return }
         bruce.isOnboarding = true
         // Show "hi!" bubble after a short delay so the character is visible first
         DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
@@ -155,7 +170,29 @@ class LilAgentsController {
 
     // MARK: - Dock Geometry
 
-    private func getDockIconArea(screenWidth: CGFloat) -> (x: CGFloat, width: CGFloat) {
+    private struct DockPrefs {
+        var tileSize: CGFloat
+        var persistentApps: Int
+        var persistentOthers: Int
+        var recentApps: Int
+        var showRecents: Bool
+        var autohide: Bool
+    }
+
+    /// Reading `com.apple.dock` parses the Dock's plist; doing it every frame allocates
+    /// constantly, so the values are cached and refreshed every couple of seconds.
+    private var dockPrefs: DockPrefs {
+        let now = CACurrentMediaTime()
+        if let cached = cachedDockPrefs, now - dockPrefsReadAt < Self.dockPrefsRefreshInterval {
+            return cached
+        }
+        let prefs = Self.readDockPrefs()
+        cachedDockPrefs = prefs
+        dockPrefsReadAt = now
+        return prefs
+    }
+
+    private static func readDockPrefs() -> DockPrefs {
         let dockDefaults = UserDefaults(suiteName: "com.apple.dock")
 
         // `double(forKey:)` and `bool(forKey:)` return 0/false for an absent key rather
@@ -166,10 +203,23 @@ class LilAgentsController {
             guard let raw = dockDefaults?.object(forKey: "tilesize") as? Double, raw > 0 else { return 48 }
             return CGFloat(raw)
         }()
-        let slotWidth = tileSize * 1.25
+        let showRecents = (dockDefaults?.object(forKey: "show-recents") as? Bool) ?? true
+        return DockPrefs(
+            tileSize: tileSize,
+            persistentApps: dockDefaults?.array(forKey: "persistent-apps")?.count ?? 0,
+            persistentOthers: dockDefaults?.array(forKey: "persistent-others")?.count ?? 0,
+            recentApps: showRecents ? (dockDefaults?.array(forKey: "recent-apps")?.count ?? 0) : 0,
+            showRecents: showRecents,
+            autohide: dockDefaults?.bool(forKey: "autohide") ?? false
+        )
+    }
 
-        var persistentApps = dockDefaults?.array(forKey: "persistent-apps")?.count ?? 0
-        var persistentOthers = dockDefaults?.array(forKey: "persistent-others")?.count ?? 0
+    private func getDockIconArea(screenWidth: CGFloat) -> (x: CGFloat, width: CGFloat) {
+        let prefs = dockPrefs
+        let slotWidth = prefs.tileSize * 1.25
+
+        var persistentApps = prefs.persistentApps
+        var persistentOthers = prefs.persistentOthers
 
         // Fallback for defaults reading issues
         if persistentApps == 0 && persistentOthers == 0 {
@@ -177,8 +227,8 @@ class LilAgentsController {
             persistentOthers = 3
         }
 
-        let showRecents = (dockDefaults?.object(forKey: "show-recents") as? Bool) ?? true
-        let recentApps = showRecents ? (dockDefaults?.array(forKey: "recent-apps")?.count ?? 0) : 0
+        let showRecents = prefs.showRecents
+        let recentApps = prefs.recentApps
         let totalIcons = persistentApps + persistentOthers + recentApps
 
         var dividers = 0
@@ -201,27 +251,67 @@ class LilAgentsController {
     }
 
     private func dockAutohideEnabled() -> Bool {
-        let dockDefaults = UserDefaults(suiteName: "com.apple.dock")
-        return dockDefaults?.bool(forKey: "autohide") ?? false
+        dockPrefs.autohide
     }
 
     // MARK: - Display Link
 
     private func startDisplayLink() {
+        stopDisplayLink()
         CVDisplayLinkCreateWithActiveCGDisplays(&displayLink)
         guard let displayLink = displayLink else { return }
 
         let callback: CVDisplayLinkOutputCallback = { _, _, _, _, _, userInfo -> CVReturn in
             let controller = Unmanaged<LilAgentsController>.fromOpaque(userInfo!).takeUnretainedValue()
-            DispatchQueue.main.async {
-                controller.tick()
-            }
+            controller.scheduleTick()
             return kCVReturnSuccess
         }
 
         CVDisplayLinkSetOutputCallback(displayLink, callback,
                                        Unmanaged.passUnretained(self).toOpaque())
         CVDisplayLinkStart(displayLink)
+    }
+
+    private func stopDisplayLink() {
+        if let displayLink, CVDisplayLinkIsRunning(displayLink) {
+            CVDisplayLinkStop(displayLink)
+        }
+        displayLink = nil
+    }
+
+    /// Called on the display link thread. Drops the frame if the previous one has not run yet.
+    private func scheduleTick() {
+        let alreadyPending = tickPending.withLock { pending in
+            defer { pending = true }
+            return pending
+        }
+        guard !alreadyPending else { return }
+        DispatchQueue.main.async { [self] in
+            tickPending.withLock { $0 = false }
+            autoreleasepool { tick() }
+        }
+    }
+
+    /// Stop animating while the Mac or its displays sleep, and rebuild the display link
+    /// when displays change — a link bound to a display that went away stops firing.
+    private func observeSystemLifecycle() {
+        let workspace = NSWorkspace.shared.notificationCenter
+        let observe: (NotificationCenter, Notification.Name, @escaping () -> Void) -> Void = { center, name, action in
+            let token = center.addObserver(forName: name, object: nil, queue: .main) { _ in action() }
+            self.lifecycleObservers.append((center, token))
+        }
+        observe(workspace, NSWorkspace.willSleepNotification) { [weak self] in self?.stopDisplayLink() }
+        observe(workspace, NSWorkspace.screensDidSleepNotification) { [weak self] in self?.stopDisplayLink() }
+        observe(workspace, NSWorkspace.didWakeNotification) { [weak self] in self?.restartAfterSystemChange() }
+        observe(workspace, NSWorkspace.screensDidWakeNotification) { [weak self] in self?.restartAfterSystemChange() }
+        observe(NotificationCenter.default, NSApplication.didChangeScreenParametersNotification) { [weak self] in
+            self?.restartAfterSystemChange()
+        }
+    }
+
+    private func restartAfterSystemChange() {
+        cachedDockPrefs = nil
+        startDisplayLink()
     }
 
     var activeScreen: NSScreen? {
@@ -318,8 +408,7 @@ class LilAgentsController {
     }
 
     deinit {
-        if let displayLink = displayLink {
-            CVDisplayLinkStop(displayLink)
-        }
+        lifecycleObservers.forEach { center, token in center.removeObserver(token) }
+        stopDisplayLink()
     }
 }

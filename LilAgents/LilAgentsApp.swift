@@ -1,6 +1,7 @@
 import SwiftUI
 import AppKit
 import Sparkle
+import ServiceManagement
 
 @main
 struct LilAgentsApp: App {
@@ -20,7 +21,44 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         NSApp.setActivationPolicy(.accessory)
         controller = LilAgentsController()
         controller?.start()
+        enableLaunchAtLoginOnFirstRun()
         setupMenuBar()
+    }
+
+    // MARK: - Launch at Login
+
+    private static let launchAtLoginConfiguredKey = "launchAtLoginConfigured"
+
+    /// Register as a login item once; afterwards the menu toggle (or System Settings) owns it.
+    private func enableLaunchAtLoginOnFirstRun() {
+        guard !UserDefaults.standard.bool(forKey: Self.launchAtLoginConfiguredKey) else { return }
+        do {
+            try SMAppService.mainApp.register()
+            UserDefaults.standard.set(true, forKey: Self.launchAtLoginConfiguredKey)
+        } catch {
+            print("Launch at login registration failed: \(error)")
+        }
+    }
+
+    private var launchesAtLogin: Bool {
+        SMAppService.mainApp.status == .enabled
+    }
+
+    @objc func toggleLaunchAtLogin(_ sender: NSMenuItem) {
+        do {
+            if launchesAtLogin {
+                try SMAppService.mainApp.unregister()
+            } else {
+                try SMAppService.mainApp.register()
+            }
+            UserDefaults.standard.set(true, forKey: Self.launchAtLoginConfiguredKey)
+        } catch {
+            print("Launch at login toggle failed: \(error)")
+            if SMAppService.mainApp.status == .requiresApproval {
+                SMAppService.openSystemSettingsLoginItems()
+            }
+        }
+        sender.state = launchesAtLogin ? .on : .off
     }
 
     func applicationWillTerminate(_ notification: Notification) {
@@ -52,6 +90,10 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         let soundItem = NSMenuItem(title: "Sounds", action: #selector(toggleSounds(_:)), keyEquivalent: "")
         soundItem.state = .on
         menu.addItem(soundItem)
+
+        let loginItem = NSMenuItem(title: "Launch at Login", action: #selector(toggleLaunchAtLogin(_:)), keyEquivalent: "")
+        loginItem.state = launchesAtLogin ? .on : .off
+        menu.addItem(loginItem)
 
         // Provider submenu (applies to all characters)
         let providerItem = NSMenuItem(title: "Provider", action: nil, keyEquivalent: "")

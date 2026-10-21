@@ -182,8 +182,8 @@ class WalkerCharacter {
         playerLayer = playback.layer
         updateFlip()
 
-        let screen = NSScreen.main!
-        let dockTopY = screen.visibleFrame.origin.y
+        // At login the window server may not have a main screen yet; tick() repositions later.
+        let dockTopY = (NSScreen.main ?? NSScreen.screens.first)?.visibleFrame.origin.y ?? 0
         let bottomPadding = displayHeight * animationLayout.bottomPaddingFraction(at: 0)
         let y = dockTopY - bottomPadding + yOffset
 
@@ -1130,7 +1130,7 @@ class WalkerCharacter {
     private func targetPosition(from start: CGFloat, amount: CGFloat, preferRight: Bool) -> CGFloat {
         let minSeparation: CGFloat = 0.12
         var end = preferRight ? min(start + amount, 1.0) : max(start - amount, 0.0)
-        for sibling in controller?.characters ?? [] where sibling !== self {
+        for sibling in controller?.characters ?? [] where sibling !== self && sibling.isManuallyVisible {
             let sibPos = sibling.positionProgress
             guard abs(end - sibPos) < minSeparation else { continue }
             end = preferRight ? max(start, sibPos - minSeparation)
