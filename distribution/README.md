@@ -4,7 +4,7 @@ Companheiros animados que passeiam pelo Dock do macOS e abrem conversas com
 provedores de IA via CLI. Esta distribuição de Ilan Salviano é baseada no projeto
 [lil-agents de Ryan Stephen](https://github.com/ryanstephen/lil-agents), sob licença MIT.
 
-**[Baixar a versão mais recente](https://github.com/IlanSalviano/lilagents-releases/releases/latest)**
+**[Baixar a versão mais recente](https://github.com/IlanSalviano/lilagents-releases/releases/latest)** · [Código-fonte da edição](https://github.com/IlanSalviano/lil-agents)
 
 Requer macOS Sonoma 14 ou posterior. Os DMGs são universais (Intel e Apple Silicon),
 assinados com Developer ID e notarizados pela Apple. Arraste **lil agents.app** para

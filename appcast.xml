@@ -3,13 +3,13 @@
     <channel>
         <title>lil agents</title>
         <item>
-            <title>1.3.1</title>
-            <pubDate>Tue, 03 Nov 2026 15:31:05 -0300</pubDate>
-            <sparkle:version>8</sparkle:version>
-            <sparkle:shortVersionString>1.3.1</sparkle:shortVersionString>
+            <title>1.3.2</title>
+            <pubDate>Tue, 03 Nov 2026 22:14:37 -0300</pubDate>
+            <sparkle:version>9</sparkle:version>
+            <sparkle:shortVersionString>1.3.2</sparkle:shortVersionString>
             <sparkle:minimumSystemVersion>14.0</sparkle:minimumSystemVersion>
-            <description><![CDATA[<h2>Amit chegou ao Dock</h2><p>Novo personagem com personalidade própria, caminhada, soco no ar com “Lets Flow!” e gesto de apontar com “Let’s make work flow!”. As falas respeitam a opção Sounds.</p>]]></description>
-            <enclosure url="https://github.com/IlanSalviano/lilagents-releases/releases/download/v1.3.1/lil-agents-1.3.1-universal.dmg" length="125799215" type="application/octet-stream" sparkle:edSignature="5pV68XWqH8OUXi/OeV9kGxbSSrVEMv+pYGjtxcSQo1Tcv9zQWK75TswSzs5Ksj7VA0dELYy0SEeWhNJSpo7UAQ=="/>
+            <description><![CDATA[<p>lil agents 1.3.2 (build 9) — vozes por personagem</p><p>Escolha uma voz diferente para cada personagem no menu Voices da barra ou em Voice no clique direito. As vozes instaladas são agrupadas por idioma e identificadas como Standard, Enhanced ou Premium.</p><p>Use Test Voice para ouvir uma prévia e Stop Preview para interrompê-la. A preferência é salva por personagem. Automatic escolhe a melhor qualidade disponível no idioma padrão; se uma voz salva ficar indisponível, o app usa uma alternativa sem apagar a escolha.</p><p>As escolhas se aplicam às falas sintetizadas de Bill e Amit e às prévias de todos os personagens. Áudios gravados nas animações não são alterados. A prévia explícita funciona mesmo com Sounds desligado.</p><p>Vozes Enhanced e Premium precisam estar instaladas no macOS. O menu inclui o guia da Apple para baixar outras vozes.</p><p>DMG universal para Intel e Apple Silicon, assinado e notarizado pela Apple. Requer macOS 14 ou posterior. Arraste o app para Aplicativos ou use Check for Updates… no menu da versão instalada.</p>]]></description>
+            <enclosure url="https://github.com/IlanSalviano/lilagents-releases/releases/download/v1.3.2/lil-agents-1.3.2-universal.dmg" length="125813109" type="application/octet-stream" sparkle:edSignature="kE42/aJaA870u5LIvDjoVYTAUd7IM6KYS6D7K5F+Lu4Og0fUdUUBLUD9htmokXyBNoc78aUn/+e27H1AULv3Dg=="/>
         </item>
     </channel>
 </rss>

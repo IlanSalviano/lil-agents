@@ -3,6 +3,7 @@
 Esta edição distribui o app completo pelo Sparkle. Novos personagens chegam
 na mesma atualização, sem instalar plugins ou copiar vídeos manualmente.
 
+- Código-fonte e PRs: https://github.com/IlanSalviano/lil-agents
 - Downloads: https://github.com/IlanSalviano/lilagents-releases/releases
 - Feed: https://raw.githubusercontent.com/IlanSalviano/lilagents-releases/main/appcast.xml
 - Assinatura Apple: Developer ID Application, equipe `22CZXFP6W7`.
