@@ -1,0 +1,9 @@
+{
+  "version": "1.3.1",
+  "build": 8,
+  "file": "lil-agents-1.3.1-universal.dmg",
+  "bytes": 125799215,
+  "edSignature": "5pV68XWqH8OUXi/OeV9kGxbSSrVEMv+pYGjtxcSQo1Tcv9zQWK75TswSzs5Ksj7VA0dELYy0SEeWhNJSpo7UAQ==",
+  "downloadURL": "https://github.com/IlanSalviano/lilagents-releases/releases/download/v1.3.1/lil-agents-1.3.1-universal.dmg",
+  "feedURL": "https://raw.githubusercontent.com/IlanSalviano/lilagents-releases/main/appcast.xml"
+}

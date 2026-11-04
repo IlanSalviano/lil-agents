@@ -13,7 +13,7 @@ class LilAgentsController {
     private var dockPrefsReadAt: CFTimeInterval = 0
     private static let dockPrefsRefreshInterval: CFTimeInterval = 2.0
     /// Characters shown at launch; the rest start hidden and can be enabled from the menu.
-    private static let visibleAtLaunch: Set<String> = ["Zenitsu", "Inosuke"]
+    private static let visibleAtLaunch: Set<String> = ["Zenitsu", "Inosuke", "Tanjiro", "Nezuko", "Bill", "Amit"]
     var debugWindow: NSWindow?
     var pinnedScreenIndex: Int = -1
     private static let onboardingKey = "hasCompletedOnboarding"
@@ -24,19 +24,29 @@ class LilAgentsController {
         let char2 = WalkerCharacter(videoName: "walk-jazz-01", name: "Jazz")
         let char3 = WalkerCharacter(videoName: "walk-zenitsu-01", name: "Zenitsu")
         let char4 = WalkerCharacter(videoName: "walk-inosuke-01", name: "Inosuke")
+        let char5 = WalkerCharacter(videoName: "walk-tanjiro-01", name: "Tanjiro")
+        let char6 = WalkerCharacter(videoName: "walk-nezuko-01", name: "Nezuko")
 
         // Detect available providers, then set first-run defaults
-        AgentProvider.detectAvailableProviders { [weak char1, weak char2, weak char3, weak char4] in
-            guard let char1, let char2, let char3, let char4 else { return }
+        AgentProvider.detectAvailableProviders { [weak char1, weak char2, weak char3, weak char4, weak char5, weak char6] in
+            guard let char1, let char2, let char3, let char4, let char5, let char6 else { return }
             if !UserDefaults.standard.bool(forKey: Self.onboardingKey) {
                 let first = AgentProvider.firstAvailable
                 char1.provider = first
                 char2.provider = first
                 char3.provider = first
                 char4.provider = first
+                char5.provider = first
+                char6.provider = first
             }
             if UserDefaults.standard.string(forKey: "InosukeProvider") == nil {
                 char4.provider = char1.provider.isAvailable ? char1.provider : AgentProvider.firstAvailable
+            }
+            if UserDefaults.standard.string(forKey: "TanjiroProvider") == nil {
+                char5.provider = char1.provider.isAvailable ? char1.provider : AgentProvider.firstAvailable
+            }
+            if UserDefaults.standard.string(forKey: "NezukoProvider") == nil {
+                char6.provider = char1.provider.isAvailable ? char1.provider : AgentProvider.firstAvailable
             }
         }
 
@@ -88,6 +98,46 @@ class LilAgentsController {
             char4.size = char1.size
         }
 
+        char5.personality = .tanjiro
+        // Generated walk begins immediately; match Dock movement to its actual steps.
+        char5.accelStart = 0.0
+        char5.fullSpeedStart = 0.3
+        char5.decelStart = 5.0
+        char5.walkStop = 5.7
+        char5.walkAmountRange = 0.35...0.6
+        char5.specialMoves = [
+            SpecialMove(videoName: "special-tanjiro-water-01", duration: 10, dashAt: 1.5,
+                        travelRange: 0...0, title: "Respiração da Água", battleCry: "Respiração da Água!"),
+            SpecialMove(videoName: "special-tanjiro-hinokami-01", duration: 10, dashAt: 1.5,
+                        travelRange: 0...0, title: "Hinokami Kagura", battleCry: "Hinokami Kagura!"),
+        ]
+        char5.specialChance = 0.25
+        char5.characterColor = NSColor(red: 0.22, green: 0.65, blue: 0.48, alpha: 1)
+        if UserDefaults.standard.string(forKey: "TanjiroSize") == nil {
+            char5.size = char1.size
+        }
+
+        char6.personality = .nezuko
+        char6.accelStart = 0.0
+        char6.fullSpeedStart = 0.3
+        char6.decelStart = 6.3
+        char6.walkStop = 7.0
+        char6.walkAmountRange = 0.2...0.4
+        char6.specialMoves = [
+            SpecialMove(videoName: "special-nezuko-run-01", duration: 10, dashAt: 0,
+                        travelRange: 0...0, travelDuration: 5.2,
+                        title: "Correr até o Zenitsu", battleCry: "Zenitsu! Me espera! ♡",
+                        approachCharacter: "Zenitsu"),
+            SpecialMove(videoName: "special-nezuko-awaken-01", duration: 10, dashAt: 3.6667,
+                        travelRange: 0.12...0.24, travelDuration: 1.8333,
+                        title: "Despertar: salto da Nezuko", battleCry: "Vou proteger meus amigos!"),
+        ]
+        char6.specialChance = 0.3
+        char6.characterColor = NSColor(red: 0.94, green: 0.49, blue: 0.65, alpha: 1)
+        if UserDefaults.standard.string(forKey: "NezukoSize") == nil {
+            char6.size = char1.size
+        }
+
         char1.yOffset = -3
         char2.yOffset = -7
         // Zenitsu's per-frame sole measurements replace the fixed vertical nudge.
@@ -104,18 +154,30 @@ class LilAgentsController {
         char2.positionProgress = 0.55
         char3.positionProgress = 0.3
         char4.positionProgress = 0.7
+        char5.positionProgress = 0.5
+        char6.positionProgress = 0.12
 
         char1.pauseEndTime = CACurrentMediaTime() + Double.random(in: 0.5...2.0)
         char2.pauseEndTime = CACurrentMediaTime() + Double.random(in: 8.0...14.0)
         char3.pauseEndTime = CACurrentMediaTime() + Double.random(in: 3.0...7.0)
         char4.pauseEndTime = CACurrentMediaTime() + 1.0
+        char5.pauseEndTime = CACurrentMediaTime() + 2.5
+        char6.pauseEndTime = CACurrentMediaTime() + 4.0
 
         char1.setup()
         char2.setup()
         char3.setup()
         char4.setup()
+        char5.setup()
+        char6.setup()
 
-        characters = [char1, char2, char3, char4]
+        characters = [char1, char2, char3, char4, char5, char6]
+        if let bill = makeBillCompanion(defaultsFrom: char1) {
+            characters.append(bill)
+        }
+        if let amit = makeAmitCompanion(defaultsFrom: char1) {
+            characters.append(amit)
+        }
         characters.forEach { $0.controller = self }
         for char in characters where !Self.visibleAtLaunch.contains(char.name) {
             char.setManuallyVisible(false)
@@ -128,6 +190,76 @@ class LilAgentsController {
         if !UserDefaults.standard.bool(forKey: Self.onboardingKey) {
             triggerOnboarding()
         }
+    }
+
+    /// Register only a complete resource set; source-only checkouts remain runnable.
+    private func makeBillCompanion(defaultsFrom other: WalkerCharacter) -> WalkerCharacter? {
+        let clips = ["walk-bill-01", "special-bill-letsgo-01", "special-bill-ai-01"]
+        guard clips.allSatisfy({ Bundle.main.url(forResource: $0, withExtension: "mov") != nil }),
+              Bundle.main.url(forResource: "bill-animation-layouts", withExtension: "json") != nil
+        else { return nil }
+        let bill = WalkerCharacter(videoName: clips[0], name: "Bill")
+        bill.personality = .bill
+        bill.accelStart = 0
+        bill.fullSpeedStart = 0.3
+        bill.decelStart = 4.8
+        bill.walkStop = 5.6
+        bill.walkAmountRange = 0.3...0.5
+        bill.specialMoves = [
+            SpecialMove(videoName: clips[1], duration: 10, travelRange: 0...0,
+                        title: "Let's go! — soco no ar", battleCry: "Let's go!",
+                        battleCryAt: 1.8, speaksBattleCry: true),
+            SpecialMove(videoName: clips[2], duration: 10, travelRange: 0...0,
+                        title: "Put AI to Work! — apontar", battleCry: "Put AI to Work!",
+                        battleCryAt: 2, speaksBattleCry: true),
+        ]
+        bill.specialChance = 0.22
+        bill.characterColor = NSColor(red: 0.30, green: 0.72, blue: 0.43, alpha: 1)
+        if UserDefaults.standard.string(forKey: "BillSize") == nil { bill.size = other.size }
+        AgentProvider.detectAvailableProviders { [weak bill, weak other] in
+            guard let bill, UserDefaults.standard.string(forKey: "BillProvider") == nil else { return }
+            let preferred = other?.provider ?? .claude
+            bill.provider = preferred.isAvailable ? preferred : AgentProvider.firstAvailable
+        }
+        bill.positionProgress = 0.85
+        bill.pauseEndTime = CACurrentMediaTime() + 5.5
+        bill.setup()
+        return bill
+    }
+
+    /// Register only a complete resource set; source-only checkouts remain runnable.
+    private func makeAmitCompanion(defaultsFrom other: WalkerCharacter) -> WalkerCharacter? {
+        let clips = ["walk-amit-01", "special-amit-flow-01", "special-amit-point-01"]
+        guard clips.allSatisfy({ Bundle.main.url(forResource: $0, withExtension: "mov") != nil }),
+              Bundle.main.url(forResource: "amit-animation-layouts", withExtension: "json") != nil
+        else { return nil }
+        let amit = WalkerCharacter(videoName: clips[0], name: "Amit")
+        amit.personality = .amit
+        amit.accelStart = 0
+        amit.fullSpeedStart = 1.0
+        amit.decelStart = 5.2
+        amit.walkStop = 6.5
+        amit.walkAmountRange = 0.3...0.5
+        amit.specialMoves = [
+            SpecialMove(videoName: clips[1], duration: 10, travelRange: 0...0,
+                        title: "Lets Flow! — soco no ar", battleCry: "Lets Flow!",
+                        battleCryAt: 2.2, speaksBattleCry: true),
+            SpecialMove(videoName: clips[2], duration: 10, travelRange: 0...0,
+                        title: "Let's make work flow! — apontar", battleCry: "Let's make work flow!",
+                        battleCryAt: 2, speaksBattleCry: true),
+        ]
+        amit.specialChance = 0.22
+        amit.characterColor = NSColor(red: 0.95, green: 0.55, blue: 0.20, alpha: 1)
+        if UserDefaults.standard.string(forKey: "AmitSize") == nil { amit.size = other.size }
+        AgentProvider.detectAvailableProviders { [weak amit, weak other] in
+            guard let amit, UserDefaults.standard.string(forKey: "AmitProvider") == nil else { return }
+            let preferred = other?.provider ?? .claude
+            amit.provider = preferred.isAvailable ? preferred : AgentProvider.firstAvailable
+        }
+        amit.positionProgress = 0.65
+        amit.pauseEndTime = CACurrentMediaTime() + 7.0
+        amit.setup()
+        return amit
     }
 
     private func triggerOnboarding() {

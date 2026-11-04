@@ -33,10 +33,27 @@
 		A10000010000000000000039 /* CharacterAnimationLayout.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000020000000000000038 /* CharacterAnimationLayout.swift */; };
 		A10000010000000000000040 /* zenitsu-animation-layouts.json in Resources */ = {isa = PBXBuildFile; fileRef = A10000020000000000000039 /* zenitsu-animation-layouts.json */; };
 		A10000010000000000000041 /* CharacterPersonality.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000020000000000000041 /* CharacterPersonality.swift */; };
+		A10000010000000000000062 /* CharacterVoice.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000020000000000000062 /* CharacterVoice.swift */; };
 		A10000010000000000000042 /* walk-inosuke-01.mov in Resources */ = {isa = PBXBuildFile; fileRef = A10000020000000000000042 /* walk-inosuke-01.mov */; };
 		A10000010000000000000043 /* special-inosuke-cross-01.mov in Resources */ = {isa = PBXBuildFile; fileRef = A10000020000000000000043 /* special-inosuke-cross-01.mov */; };
 		A10000010000000000000044 /* special-inosuke-rush-01.mov in Resources */ = {isa = PBXBuildFile; fileRef = A10000020000000000000044 /* special-inosuke-rush-01.mov */; };
 		A10000010000000000000045 /* inosuke-animation-layouts.json in Resources */ = {isa = PBXBuildFile; fileRef = A10000020000000000000045 /* inosuke-animation-layouts.json */; };
+		A10000010000000000000046 /* walk-tanjiro-01.mov in Resources */ = {isa = PBXBuildFile; fileRef = A10000020000000000000046 /* walk-tanjiro-01.mov */; };
+		A10000010000000000000047 /* special-tanjiro-water-01.mov in Resources */ = {isa = PBXBuildFile; fileRef = A10000020000000000000047 /* special-tanjiro-water-01.mov */; };
+		A10000010000000000000048 /* special-tanjiro-hinokami-01.mov in Resources */ = {isa = PBXBuildFile; fileRef = A10000020000000000000048 /* special-tanjiro-hinokami-01.mov */; };
+		A10000010000000000000049 /* tanjiro-animation-layouts.json in Resources */ = {isa = PBXBuildFile; fileRef = A10000020000000000000049 /* tanjiro-animation-layouts.json */; };
+		A10000010000000000000050 /* walk-nezuko-01.mov in Resources */ = {isa = PBXBuildFile; fileRef = A10000020000000000000050 /* walk-nezuko-01.mov */; };
+		A10000010000000000000051 /* special-nezuko-run-01.mov in Resources */ = {isa = PBXBuildFile; fileRef = A10000020000000000000051 /* special-nezuko-run-01.mov */; };
+		A10000010000000000000052 /* special-nezuko-awaken-01.mov in Resources */ = {isa = PBXBuildFile; fileRef = A10000020000000000000052 /* special-nezuko-awaken-01.mov */; };
+		A10000010000000000000053 /* nezuko-animation-layouts.json in Resources */ = {isa = PBXBuildFile; fileRef = A10000020000000000000053 /* nezuko-animation-layouts.json */; };
+		A10000010000000000000054 /* walk-bill-01.mov in Resources */ = {isa = PBXBuildFile; fileRef = A10000020000000000000054 /* walk-bill-01.mov */; };
+		A10000010000000000000058 /* walk-amit-01.mov in Resources */ = {isa = PBXBuildFile; fileRef = A10000020000000000000058 /* walk-amit-01.mov */; };
+		A10000010000000000000055 /* special-bill-letsgo-01.mov in Resources */ = {isa = PBXBuildFile; fileRef = A10000020000000000000055 /* special-bill-letsgo-01.mov */; };
+		A10000010000000000000059 /* special-amit-flow-01.mov in Resources */ = {isa = PBXBuildFile; fileRef = A10000020000000000000059 /* special-amit-flow-01.mov */; };
+		A10000010000000000000056 /* special-bill-ai-01.mov in Resources */ = {isa = PBXBuildFile; fileRef = A10000020000000000000056 /* special-bill-ai-01.mov */; };
+		A10000010000000000000060 /* special-amit-point-01.mov in Resources */ = {isa = PBXBuildFile; fileRef = A10000020000000000000060 /* special-amit-point-01.mov */; };
+		A10000010000000000000057 /* bill-animation-layouts.json in Resources */ = {isa = PBXBuildFile; fileRef = A10000020000000000000057 /* bill-animation-layouts.json */; };
+		A10000010000000000000061 /* amit-animation-layouts.json in Resources */ = {isa = PBXBuildFile; fileRef = A10000020000000000000061 /* amit-animation-layouts.json */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -68,10 +85,27 @@
 		A10000020000000000000038 /* CharacterAnimationLayout.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CharacterAnimationLayout.swift; sourceTree = "<group>"; };
 		A10000020000000000000039 /* zenitsu-animation-layouts.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = "zenitsu-animation-layouts.json"; sourceTree = "<group>"; };
 		A10000020000000000000041 /* CharacterPersonality.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "CharacterPersonality.swift"; sourceTree = "<group>"; };
+		A10000020000000000000062 /* CharacterVoice.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "CharacterVoice.swift"; sourceTree = "<group>"; };
 		A10000020000000000000042 /* walk-inosuke-01.mov */ = {isa = PBXFileReference; lastKnownFileType = video.quicktime; path = "walk-inosuke-01.mov"; sourceTree = "<group>"; };
 		A10000020000000000000043 /* special-inosuke-cross-01.mov */ = {isa = PBXFileReference; lastKnownFileType = video.quicktime; path = "special-inosuke-cross-01.mov"; sourceTree = "<group>"; };
 		A10000020000000000000044 /* special-inosuke-rush-01.mov */ = {isa = PBXFileReference; lastKnownFileType = video.quicktime; path = "special-inosuke-rush-01.mov"; sourceTree = "<group>"; };
 		A10000020000000000000045 /* inosuke-animation-layouts.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = "inosuke-animation-layouts.json"; sourceTree = "<group>"; };
+		A10000020000000000000046 /* walk-tanjiro-01.mov */ = {isa = PBXFileReference; lastKnownFileType = video.quicktime; path = "walk-tanjiro-01.mov"; sourceTree = "<group>"; };
+		A10000020000000000000047 /* special-tanjiro-water-01.mov */ = {isa = PBXFileReference; lastKnownFileType = video.quicktime; path = "special-tanjiro-water-01.mov"; sourceTree = "<group>"; };
+		A10000020000000000000048 /* special-tanjiro-hinokami-01.mov */ = {isa = PBXFileReference; lastKnownFileType = video.quicktime; path = "special-tanjiro-hinokami-01.mov"; sourceTree = "<group>"; };
+		A10000020000000000000049 /* tanjiro-animation-layouts.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = "tanjiro-animation-layouts.json"; sourceTree = "<group>"; };
+		A10000020000000000000050 /* walk-nezuko-01.mov */ = {isa = PBXFileReference; lastKnownFileType = video.quicktime; path = "walk-nezuko-01.mov"; sourceTree = "<group>"; };
+		A10000020000000000000051 /* special-nezuko-run-01.mov */ = {isa = PBXFileReference; lastKnownFileType = video.quicktime; path = "special-nezuko-run-01.mov"; sourceTree = "<group>"; };
+		A10000020000000000000052 /* special-nezuko-awaken-01.mov */ = {isa = PBXFileReference; lastKnownFileType = video.quicktime; path = "special-nezuko-awaken-01.mov"; sourceTree = "<group>"; };
+		A10000020000000000000053 /* nezuko-animation-layouts.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = "nezuko-animation-layouts.json"; sourceTree = "<group>"; };
+		A10000020000000000000054 /* walk-bill-01.mov */ = {isa = PBXFileReference; lastKnownFileType = video.quicktime; path = "walk-bill-01.mov"; sourceTree = "<group>"; };
+		A10000020000000000000058 /* walk-amit-01.mov */ = {isa = PBXFileReference; lastKnownFileType = video.quicktime; path = "walk-amit-01.mov"; sourceTree = "<group>"; };
+		A10000020000000000000055 /* special-bill-letsgo-01.mov */ = {isa = PBXFileReference; lastKnownFileType = video.quicktime; path = "special-bill-letsgo-01.mov"; sourceTree = "<group>"; };
+		A10000020000000000000059 /* special-amit-flow-01.mov */ = {isa = PBXFileReference; lastKnownFileType = video.quicktime; path = "special-amit-flow-01.mov"; sourceTree = "<group>"; };
+		A10000020000000000000056 /* special-bill-ai-01.mov */ = {isa = PBXFileReference; lastKnownFileType = video.quicktime; path = "special-bill-ai-01.mov"; sourceTree = "<group>"; };
+		A10000020000000000000060 /* special-amit-point-01.mov */ = {isa = PBXFileReference; lastKnownFileType = video.quicktime; path = "special-amit-point-01.mov"; sourceTree = "<group>"; };
+		A10000020000000000000057 /* bill-animation-layouts.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = "bill-animation-layouts.json"; sourceTree = "<group>"; };
+		A10000020000000000000061 /* amit-animation-layouts.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = "amit-animation-layouts.json"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -114,9 +148,26 @@
 				A10000020000000000000038 /* CharacterAnimationLayout.swift */,
 				A10000020000000000000039 /* zenitsu-animation-layouts.json */,
 				A10000020000000000000041 /* CharacterPersonality.swift */,
+				A10000020000000000000062 /* CharacterVoice.swift */,
 				A10000020000000000000042 /* walk-inosuke-01.mov */,
 				A10000020000000000000043 /* special-inosuke-cross-01.mov */,
 				A10000020000000000000044 /* special-inosuke-rush-01.mov */,
+				A10000020000000000000046 /* walk-tanjiro-01.mov */,
+				A10000020000000000000047 /* special-tanjiro-water-01.mov */,
+				A10000020000000000000048 /* special-tanjiro-hinokami-01.mov */,
+				A10000020000000000000050 /* walk-nezuko-01.mov */,
+				A10000020000000000000051 /* special-nezuko-run-01.mov */,
+				A10000020000000000000052 /* special-nezuko-awaken-01.mov */,
+				A10000020000000000000053 /* nezuko-animation-layouts.json */,
+				A10000020000000000000057 /* bill-animation-layouts.json */,
+				A10000020000000000000061 /* amit-animation-layouts.json */,
+				A10000020000000000000056 /* special-bill-ai-01.mov */,
+				A10000020000000000000060 /* special-amit-point-01.mov */,
+				A10000020000000000000055 /* special-bill-letsgo-01.mov */,
+				A10000020000000000000059 /* special-amit-flow-01.mov */,
+				A10000020000000000000054 /* walk-bill-01.mov */,
+				A10000020000000000000058 /* walk-amit-01.mov */,
+				A10000020000000000000049 /* tanjiro-animation-layouts.json */,
 				A10000020000000000000045 /* inosuke-animation-layouts.json */,
 				A10000020000000000000025 /* LilAgentsController.swift */,
 				A10000020000000000000002 /* walk-bruce-01.mov */,
@@ -204,6 +255,22 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				A10000010000000000000046 /* walk-tanjiro-01.mov in Resources */,
+				A10000010000000000000047 /* special-tanjiro-water-01.mov in Resources */,
+				A10000010000000000000048 /* special-tanjiro-hinokami-01.mov in Resources */,
+				A10000010000000000000050 /* walk-nezuko-01.mov in Resources */,
+				A10000010000000000000051 /* special-nezuko-run-01.mov in Resources */,
+				A10000010000000000000052 /* special-nezuko-awaken-01.mov in Resources */,
+				A10000010000000000000053 /* nezuko-animation-layouts.json in Resources */,
+				A10000010000000000000057 /* bill-animation-layouts.json in Resources */,
+				A10000010000000000000061 /* amit-animation-layouts.json in Resources */,
+				A10000010000000000000056 /* special-bill-ai-01.mov in Resources */,
+				A10000010000000000000060 /* special-amit-point-01.mov in Resources */,
+				A10000010000000000000055 /* special-bill-letsgo-01.mov in Resources */,
+				A10000010000000000000059 /* special-amit-flow-01.mov in Resources */,
+				A10000010000000000000054 /* walk-bill-01.mov in Resources */,
+				A10000010000000000000058 /* walk-amit-01.mov in Resources */,
+				A10000010000000000000049 /* tanjiro-animation-layouts.json in Resources */,
 				A10000010000000000000045 /* inosuke-animation-layouts.json in Resources */,
 				A10000010000000000000044 /* special-inosuke-rush-01.mov in Resources */,
 				A10000010000000000000043 /* special-inosuke-cross-01.mov in Resources */,
@@ -227,6 +294,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				A10000010000000000000041 /* CharacterPersonality.swift in Sources */,
+				A10000010000000000000062 /* CharacterVoice.swift in Sources */,
 				A10000010000000000000001 /* LilAgentsApp.swift in Sources */,
 				A10000010000000000000020 /* PopoverTheme.swift in Sources */,
 				A10000010000000000000021 /* CharacterContentView.swift in Sources */,
@@ -363,7 +431,7 @@
 				CODE_SIGN_ENTITLEMENTS = LilAgents/LilAgents.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 6;
+				CURRENT_PROJECT_VERSION = 9;
 				DEAD_CODE_STRIPPING = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = LilAgents/Info.plist;
@@ -375,7 +443,7 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MARKETING_VERSION = 1.2.2;
+				MARKETING_VERSION = 1.3.2;
 				PRODUCT_BUNDLE_IDENTIFIER = com.lilagents.app;
 				PRODUCT_NAME = "lil agents";
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -391,7 +459,7 @@
 				CODE_SIGN_ENTITLEMENTS = LilAgents/LilAgents.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 6;
+				CURRENT_PROJECT_VERSION = 9;
 				DEAD_CODE_STRIPPING = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = LilAgents/Info.plist;
@@ -403,7 +471,7 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MARKETING_VERSION = 1.2.2;
+				MARKETING_VERSION = 1.3.2;
 				ONLY_ACTIVE_ARCH = NO;
 				PRODUCT_BUNDLE_IDENTIFIER = com.lilagents.app;
 				PRODUCT_NAME = "lil agents";

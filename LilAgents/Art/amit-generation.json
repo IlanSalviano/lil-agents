@@ -1,0 +1,47 @@
+{
+  "imageTool": "built-in image_gen",
+  "imagePrompt": "Use case: stylized-concept. Asset type: reference artwork for a tiny animated macOS Dock companion. Create a single full-body polished chibi 3D cartoon caricature inspired by Amit Zavery of ServiceNow: Indian middle-aged man, warm medium brown skin, short neatly combed salt-and-pepper silver hair with a side part, clean shaven broad friendly face, dark expressive eyes, thick dark eyebrows and a confident warm smile. No glasses. Distinctive smart casual charcoal gray quarter-zip sweater with a subtle orange trim inside the collar, dark charcoal trousers, dark sneakers with light soles. Approachable technical product leader, composed and optimistic. Large head, small body, premium toy-like rendering matching cute anime desktop companions. Standing neutral ready pose with two relaxed arms separated slightly from torso, feet visible, facing three-quarter right. Entire character centered within middle 60 percent height of a portrait canvas, generous empty margin all sides for future raised arm gestures. Solid perfectly flat vivid magenta #ff00ff background for video chroma key, no floor or cast shadow. Even lighting. Exactly one character, two arms, two legs, no text, no logos, no objects, no watermark.",
+  "reference": "amit-reference.png",
+  "inspiration": "https://www.servicenow.com/company/leadership/amit-zavery.html",
+  "voice": "Generic macOS English voice; fictional interpretation, no voice cloning.",
+  "videoTool": "Existing GrokVideoClient, official xAI image-to-video API",
+  "videoModel": "grok-imagine-video",
+  "sourcePrompts": "scripts/amit-prompts.json",
+  "videos": {
+    "special-amit-point-01": {
+      "duration": 10,
+      "model": "grok-imagine-video",
+      "output_path": "/Volumes/Brain/Dev/lilagents/build/amit/source/special-amit-point-01.mp4",
+      "progress": 100,
+      "request_id": "c7fdae2f-41e1-92b6-8c78-3630b85e819d",
+      "resolution": "720p",
+      "status": "downloaded"
+    },
+    "special-amit-flow-01": {
+      "duration": 10,
+      "model": "grok-imagine-video",
+      "output_path": "/Volumes/Brain/Dev/lilagents/build/amit/source/special-amit-flow-01.mp4",
+      "progress": 100,
+      "request_id": "0a33a5ac-a212-98ed-b34d-097f3593babe",
+      "resolution": "720p",
+      "status": "downloaded"
+    },
+    "walk-amit-01": {
+      "duration": 10,
+      "model": "grok-imagine-video",
+      "output_path": "/Volumes/Brain/Dev/lilagents/build/amit/source/walk-amit-01.mp4",
+      "progress": 100,
+      "request_id": "149a565e-a6a3-9322-a5bb-d4341b632d05",
+      "resolution": "720p",
+      "status": "downloaded"
+    }
+  },
+  "editing": {
+    "all": "240 frames at 24fps; magenta key; native HEVC alpha; sole calibration from all native decoded frames.",
+    "walk": "Dock travel decelerates at 5.2 seconds and stops at 6.5 seconds to match the generated walk.",
+    "speechCues": {
+      "special-amit-flow-01": 2.2,
+      "special-amit-point-01": 2.0
+    }
+  }
+}

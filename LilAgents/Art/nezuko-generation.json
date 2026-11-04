@@ -1,0 +1,92 @@
+{
+  "imageTool": "built-in imagegen",
+  "imageSource": "nezuko-reference.png",
+  "imagePrompt": "Use case: stylized-concept. Asset type: source artwork for an animated macOS Dock companion. Create ONE super cute TINY CHIBI NEZUKO KAMADO from Demon Slayer, miniature form, about 2.2 heads tall, large round expressive pink eyes, sweet shy determined face, long flowing black hair with warm orange tips, pink ribbon at side of hair, recognizable green bamboo muzzle attached by a red cord. Wearing the iconic pale pink geometric asanoha kimono COMPLETELY CLOSED and fully covering torso and legs, red-and-white checkered obi with a green center cord, loose dark brown haori, white leg wraps and small pink-strapped sandals. Exactly two arms, two hands, two legs. High quality hand-drawn 2D anime cel shading and crisp dark outlines; detailed appealing anime companion matching a chibi Inosuke. Full body, right-facing THREE-QUARTER SIDE PROFILE, both sandal soles on one horizontal ground line, feet visible, arms relaxed slightly bent in front as if about to toddle. Portrait 9:16 canvas. IMPORTANT tiny character occupies only 42 percent of total canvas HEIGHT, head top at 40 percent and sandal soles at 82 percent, centered horizontally; generous empty space above and around to allow later growing and jumping. Absolutely flat solid chroma BLUE #0000FF background, no blue anywhere on the character. No ground, no shadow, no gradient, no scenery, no effects, no text, no watermark, no other character, no weapons, no cropped limbs. Cute innocent mascot design.",
+  "runImageSource": "nezuko-run-reference.png",
+  "runImagePrompt": "Edit image 1, which is our Nezuko mascot source artwork. Image 2 is ONLY a reference for the tiny Nezuko's oversized sleeves and adorable forward-reaching run, not for its setting or other person. Preserve the exact face, pink eyes, bamboo muzzle, hair and colors, kimono pattern, clean detailed cel anime style, RIGHT-facing three-quarter side view, full body and flat solid BLUE #0000FF background of image 1. Change her dark brown haori into a comically OVERSIZED haori with very long wide loose sleeves extending WELL BEYOND her hands, completely hiding her hands. Pose both arms stretched straight forward toward the RIGHT at shoulder height, parallel and slightly apart in perspective, the drooping oversized sleeve cuffs pointing forward and bouncing loosely, like tiny Nezuko running in image 2. No hands visible at sleeve openings. Little feet ready to run, both on original ground line at 82% canvas height. Keep tiny chibi head-body proportions, approximately 2.2 heads tall. Make the whole character SMALLER on this same 9:16 portrait canvas: body height 40% of canvas, top of head at 42%, sandal soles at 82%. Ample clear blue margins above and on both sides, especially to the right of extended sleeves. Exactly one character, two arms, two legs; no effects, shadow, ground, text, forest or other character.",
+  "awakenImageSource": "nezuko-awaken-reference.png",
+  "awakenImagePrompt": "Precision composition edit of this single Nezuko source artwork. Keep the same tiny character design, same pose, same clothes, same art quality and solid pure BLUE #0000FF background. Scale down the ENTIRE character to just 60 percent of her CURRENT width and height, leaving her sandal soles at the SAME ground position near 82% of canvas height. This is for a video where she must grow significantly: there MUST be a very large amount of empty blue space above her head and on all sides. On this full portrait 9:16 image, the tiny character must fit entirely inside x=35%..65% and y=52%..82%. Her body is only 30% of canvas height. Do NOT crop the canvas or zoom in. Full original canvas remains. One single tiny character, no text, no shadow, no effects. The empty blue space is intentional and necessary.",
+  "videoPrompts": "../../scripts/nezuko-prompts.json",
+  "videoClient": "scripts/generate_nezuko.py via GrokVideoClient",
+  "status": "validated",
+  "jumpInterval": [
+    3.6666666666666665,
+    5.5
+  ],
+  "acceptedSources": {
+    "walk-nezuko-01": "walk-nezuko-01",
+    "special-nezuko-run-01": "special-nezuko-run-01",
+    "special-nezuko-awaken-01": "special-nezuko-awaken-01-v3"
+  },
+  "rejectedSources": {
+    "special-nezuko-awaken-01": "Growth insufficient and hair cropped at the left edge.",
+    "special-nezuko-awaken-01-v2": "Flame cropped at the top; recovery retained horn; the kick and jump were separate."
+  },
+  "awakeningEdit": "Source v3 frames 0...110, then 109...0, then hold frame 0 for 20 frames at 24fps. Uses the clean growth and airborne right kick, reverses the recovery to land and shrink to the exact tiny form. Excludes ghost silhouette and retained horn in the provider's later recovery.",
+  "clips": {
+    "special-nezuko-awaken-01-v2": {
+      "request_id": "90c36bc3-cd0c-936f-b446-cb3f5ac623c1",
+      "model": "grok-imagine-video",
+      "duration": 10,
+      "resolution": "720p",
+      "status": "downloaded",
+      "sourceSha256": "82e5423222552c331e69e87bc0f6df7c73706ba8a8c0dfb3ad072bf4d7f9aada"
+    },
+    "special-nezuko-awaken-01-v3": {
+      "request_id": "638fc676-36c8-9d36-b77a-126940241329",
+      "model": "grok-imagine-video",
+      "duration": 10,
+      "resolution": "720p",
+      "status": "downloaded",
+      "sourceSha256": "bae628d4f45d05453dd18dda73b8b54fed0ebd7f8e1872edcbb6596de7b71b31"
+    },
+    "special-nezuko-awaken-01": {
+      "request_id": "44203d24-ff22-9c18-9e30-e49fe6e077f9",
+      "model": "grok-imagine-video",
+      "duration": 10,
+      "resolution": "720p",
+      "status": "downloaded",
+      "sourceSha256": "0b21ee27180853ab399b39cba33d4528be7942c423dcf4d23427bcd97657c4b3"
+    },
+    "special-nezuko-run-01": {
+      "request_id": "06177d66-a72f-95e7-9f5f-de9e5f0e5df1",
+      "model": "grok-imagine-video",
+      "duration": 10,
+      "resolution": "720p",
+      "status": "downloaded",
+      "sourceSha256": "7587635ebd4506c0b72f7ba86bf41aa276c09a174a7cf3771c43fded7770c7d9"
+    },
+    "walk-nezuko-01": {
+      "request_id": "c3030f73-bc06-9a36-bb20-c4a0374ae509",
+      "model": "grok-imagine-video",
+      "duration": 10,
+      "resolution": "720p",
+      "status": "downloaded",
+      "sourceSha256": "b5e6eca314be4bcd8ae6088a8d0463d23f1dac2a210f0a77a2740bff3080bd1e"
+    }
+  },
+  "referenceSha256": {
+    "nezuko-awaken-reference.png": "93e76a4afc86b227a7cd281548bac618d7c092d5ccfcb0f661335e41cb58ef65",
+    "nezuko-run-reference.png": "442a5516606601c57ad0a59fae09accb7f69cdeb9a7d905ceaf60a34600c6cc9",
+    "nezuko-reference.png": "5df07b05c330c124f69960ae99540c3249ebefcc33e7baf1c68e8967cfd2fefb"
+  },
+  "bundledAssetsSha256": {
+    "special-nezuko-awaken-01.mov": "db88e70c81080b710966ead9478f3420db51ef2ae06519d530bbba7a888169c2",
+    "special-nezuko-run-01.mov": "dd5260186526efd7bc29128856c2a808a055bebe8d8997dd98579295cdc3f003",
+    "walk-nezuko-01.mov": "57890ebbb556f5684704118eade2e50952a610ee2cb783eb191a93b84d37b734",
+    "nezuko-animation-layouts.json": "8f03c5ad6b4453360a01e0d9ab9c4d1b54e339dfdb8b13c7e268be3fdca14a02"
+  },
+  "validation": {
+    "nativeDecodedFrames": 723,
+    "assetTests": "passed (alpha, silhouette bounds, growth, airtime, recovery, bundle resources)",
+    "swiftDockLayoutPersonalityTests": "passed",
+    "nezukoRuntime": "passed",
+    "inosukeRuntime": "passed",
+    "tanjiroRuntime": "passed",
+    "xcodeBuild": "passed",
+    "sourceBundleInstalledHashes": "match",
+    "installedApp": "/Applications/lil agents.app",
+    "uiSmokeCheck": "Nezuko visible and both named moves present in right-click menu",
+    "preview": "../../build/nezuko/nezuko-preview.gif"
+  }
+}

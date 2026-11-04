@@ -30,6 +30,11 @@ struct SpecialMove {
     var travelDuration: CFTimeInterval = 0
     var title: String?
     var battleCry: String?
+    /// Follow this visible companion instead of choosing a random destination.
+    var approachCharacter: String?
+    /// Trigger against the video playhead, so buffering cannot lead the gesture.
+    var battleCryAt: CFTimeInterval = 0
+    var speaksBattleCry = false
 }
 
 class WalkerCharacter {
@@ -123,6 +128,17 @@ class WalkerCharacter {
     private var activeSpecialDuration: CFTimeInterval = 2.5
     private var activeSpecialDashAt: CFTimeInterval = 0.7
     private var activeSpecialTravelDuration: CFTimeInterval = 0
+    private weak var activeApproachTarget: WalkerCharacter?
+    private var pendingSpecialCry: SpecialMove?
+    private var actionSpeech: AVSpeechSynthesizer?
+    lazy var voiceSettings: CharacterVoice = {
+        let language = ["Zenitsu", "Inosuke", "Tanjiro", "Nezuko"].contains(name) ? "pt-BR" : "en-US"
+        let settings = CharacterVoice(characterName: name, defaultLanguage: language)
+        settings.stopCharacterSpeech = { [weak self] in
+            self?.actionSpeech?.stopSpeaking(at: .immediate)
+        }
+        return settings
+    }()
 
     // Onboarding
     var isOnboarding = false
@@ -234,6 +250,7 @@ class WalkerCharacter {
             }
         } else {
             queuePlayer.pause()
+            actionSpeech?.stopSpeaking(at: .immediate)
             window.orderOut(nil)
             popoverWindow?.orderOut(nil)
             thinkingBubbleWindow?.orderOut(nil)
@@ -248,6 +265,7 @@ class WalkerCharacter {
         wasBubbleVisibleBeforeEnvironmentHide = thinkingBubbleWindow?.isVisible ?? false
 
         queuePlayer.pause()
+        actionSpeech?.stopSpeaking(at: .immediate)
         window.orderOut(nil)
         popoverWindow?.orderOut(nil)
         thinkingBubbleWindow?.orderOut(nil)
@@ -321,7 +339,7 @@ class WalkerCharacter {
         terminalView?.inputField.isEditable = false
         terminalView?.inputField.placeholderString = ""
         let welcome = """
-        hey! we're bruce, jazz, zenitsu, and inosuke — your lil dock agents.
+        hey! we're your lil dock agents.
 
         click any of us to open a Claude AI chat. we'll walk around while you work and let you know when Claude's thinking.
 
@@ -934,6 +952,7 @@ class WalkerCharacter {
     }
 
     func startWalk() {
+        activeApproachTarget = nil
         isPaused = false
         isWalking = true
         isPlayingSpecial = false
@@ -987,6 +1006,8 @@ class WalkerCharacter {
     }
 
     func enterPause() {
+        pendingSpecialCry = nil
+        actionSpeech?.stopSpeaking(at: .immediate)
         isWalking = false
         isPlayingSpecial = false
         isPaused = true
@@ -1002,19 +1023,30 @@ class WalkerCharacter {
         // Pick a random special whose video is present in the bundle.
         let candidates = index.map { specialMoves.indices.contains($0) ? [specialMoves[$0]] : [] } ?? specialMoves
         let available = candidates.compactMap { move -> (SpecialMove, URL)? in
+            if let name = move.approachCharacter, approachCompanion(named: name) == nil { return nil }
             guard let url = Bundle.main.url(forResource: move.videoName, withExtension: "mov") else {
                 return nil
             }
             return (move, url)
         }
         guard let (move, specialURL) = available.randomElement() else {
+            if let move = candidates.first, let name = move.approachCharacter, index != nil {
+                if isPlayingSpecial { finishSpecial(restoreWalk: true) }
+                enterPause()
+                sayAction("Cadê o \(name)?")
+                return
+            }
             startWalk()
             return
         }
 
         activeSpecialDuration = move.duration ?? specialDuration
+        actionSpeech?.stopSpeaking(at: .immediate)
+        actionPhraseExpiry = 0
+        pendingSpecialCry = move
         activeSpecialDashAt = move.dashAt ?? specialDashAt
         activeSpecialTravelDuration = move.travelDuration
+        activeApproachTarget = move.approachCharacter.flatMap { approachCompanion(named: $0) }
         let travelRange = move.travelRange ?? specialTravelRange
 
         isPaused = false
@@ -1040,12 +1072,28 @@ class WalkerCharacter {
                 walkEndPos = flipped
             }
         }
+        if let target = activeApproachTarget {
+            updateApproachDestination(toward: target)
+        } else if travel == 0 {
+            // A planted gesture must not be displaced by sibling avoidance.
+            walkEndPos = walkStartPos
+        }
         walkStartPixel = walkStartPos * currentTravelDistance
         walkEndPixel = walkEndPos * currentTravelDistance
 
         selectAnimation(move.videoName, url: specialURL)
         playFromBeginning()
-        if let phrase = move.battleCry { sayAction(phrase) }
+    }
+
+    private func updateSpecialCry(at time: Double) {
+        guard let move = pendingSpecialCry, time >= move.battleCryAt else { return }
+        pendingSpecialCry = nil
+        guard let phrase = move.battleCry else { return }
+        sayAction(phrase)
+        guard move.speaksBattleCry, Self.soundsEnabled else { return }
+        let speech = actionSpeech ?? AVSpeechSynthesizer()
+        actionSpeech = speech
+        speech.speak(voiceSettings.utterance(for: phrase))
     }
 
     private func sayAction(_ phrase: String) {
@@ -1059,11 +1107,41 @@ class WalkerCharacter {
         startSpecial(at: sender.tag)
     }
 
-    private func finishSpecial(restoreWalk: Bool) {
+    private func approachCompanion(named name: String) -> WalkerCharacter? {
+        controller?.characters.first {
+            $0 !== self && $0.name == name && $0.isManuallyVisible && $0.environmentHiddenAt == nil
+        }
+    }
+
+    private func updateApproachDestination(toward target: WalkerCharacter) {
+        let wasGoingRight = goingRight
+        let halfWidth = size.height * videoWidth / videoHeight / 2
+        let targetHalfWidth = target.size.height * videoWidth / videoHeight / 2
+        let targetCenter = target.positionProgress * target.currentTravelDistance + targetHalfWidth
+        let separation = max(32, (halfWidth + targetHalfWidth) * 0.65)
+        let end = CompanionApproach.destination(
+            start: walkStartPos * currentTravelDistance + halfWidth,
+            target: targetCenter, separation: separation,
+            bounds: halfWidth...(halfWidth + currentTravelDistance)
+        )
+        walkEndPos = currentTravelDistance > 0 ? (end - halfWidth) / currentTravelDistance : positionProgress
+        if abs(walkEndPos - positionProgress) > 0.001 {
+            goingRight = walkEndPos > positionProgress
+        } else {
+            goingRight = targetCenter >= end
+        }
+        if goingRight != wasGoingRight, playerLayer != nil { updateFlip() }
+    }
+
+    private func finishSpecial(restoreWalk: Bool, completed: Bool = false) {
+        pendingSpecialCry = nil
+        actionSpeech?.stopSpeaking(at: .immediate)
+        actionPhraseExpiry = 0
         isPlayingSpecial = false
         specialHasDashed = false
-        // Land at destination even if cancelled mid-anticipation
-        positionProgress = walkEndPos
+        // Opening chat during a companion run must not teleport to the friend.
+        if activeApproachTarget == nil || completed { positionProgress = walkEndPos }
+        activeApproachTarget = nil
         if restoreWalk {
             selectAnimation(videoName)
         }
@@ -1208,12 +1286,24 @@ class WalkerCharacter {
 
         if isPlayingSpecial {
             let elapsed = animationTime
+            if !Self.soundsEnabled { actionSpeech?.stopSpeaking(at: .immediate) }
+            if !isPreparingPlayback { updateSpecialCry(at: elapsed) }
             let progress = SpecialTravel.progress(time: elapsed, start: activeSpecialDashAt,
                                                   duration: activeSpecialTravelDuration)
+            if let target = activeApproachTarget, !specialHasDashed {
+                guard target.isManuallyVisible, target.environmentHiddenAt == nil else {
+                    finishSpecial(restoreWalk: true)
+                    enterPause()
+                    placeWindow(dockX: dockX, dockTopY: dockTopY)
+                    updateThinkingBubble()
+                    return
+                }
+                updateApproachDestination(toward: target)
+            }
             positionProgress = walkStartPos + (walkEndPos - walkStartPos) * CGFloat(progress)
             specialHasDashed = progress >= 1
             if elapsed >= activeSpecialDuration {
-                finishSpecial(restoreWalk: true)
+                finishSpecial(restoreWalk: true, completed: true)
                 enterPause()
                 placeWindow(dockX: dockX, dockTopY: dockTopY)
                 updateThinkingBubble()

@@ -28,3 +28,8 @@ xcuserdata/
 
 # Working material (reference/verification images)
 assets/
+
+# Generated distribution artifacts and Python caches
+dist/
+__pycache__/
+*.pyc

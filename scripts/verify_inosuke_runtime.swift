@@ -29,7 +29,7 @@ struct InosukeRuntimeReview {
                                              toleranceBefore: .zero, toleranceAfter: .zero)
             character.update(dockX: 0, dockWidth: 800, dockTopY: 90)
         }
-        expect(controller.characters.count == 4, "All four characters load")
+        expect(controller.characters.count == 8, "All eight characters load")
         expect(character.personality != nil && character.specialMoves.count == 2, "Personality and both attacks registered")
         character.startSpecial(at: 0)
         try await Task.sleep(for: .milliseconds(400))

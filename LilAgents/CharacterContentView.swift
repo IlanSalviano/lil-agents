@@ -59,7 +59,7 @@ class CharacterContentView: NSView {
     }
 
     override func menu(for event: NSEvent) -> NSMenu? {
-        guard let character, !character.specialMoves.isEmpty else { return nil }
+        guard let character else { return nil }
         let menu = NSMenu(title: character.name)
         for (index, move) in character.specialMoves.enumerated() {
             let item = NSMenuItem(title: move.title ?? "Special \(index + 1)",
@@ -68,6 +68,10 @@ class CharacterContentView: NSView {
             item.tag = index
             menu.addItem(item)
         }
+        if !character.specialMoves.isEmpty { menu.addItem(.separator()) }
+        let voiceItem = NSMenuItem(title: "Voice", action: nil, keyEquivalent: "")
+        voiceItem.submenu = character.voiceSettings.makeMenu()
+        menu.addItem(voiceItem)
         return menu
     }
 }

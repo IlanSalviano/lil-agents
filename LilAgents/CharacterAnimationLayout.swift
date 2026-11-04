@@ -15,7 +15,7 @@ struct CharacterAnimationLayout: Decodable {
 
     private static let bundled: [String: CharacterAnimationLayout] = {
         var result: [String: CharacterAnimationLayout] = [:]
-        for resource in ["zenitsu-animation-layouts", "inosuke-animation-layouts"] {
+        for resource in ["zenitsu-animation-layouts", "inosuke-animation-layouts", "tanjiro-animation-layouts", "nezuko-animation-layouts", "bill-animation-layouts", "amit-animation-layouts"] {
             guard let url = Bundle.main.url(forResource: resource, withExtension: "json"),
                   let data = try? Data(contentsOf: url),
                   let layouts = try? JSONDecoder().decode([String: CharacterAnimationLayout].self, from: data)

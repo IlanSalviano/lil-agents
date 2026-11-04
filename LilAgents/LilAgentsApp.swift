@@ -91,6 +91,16 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         soundItem.state = .on
         menu.addItem(soundItem)
 
+        let voicesItem = NSMenuItem(title: "Voices", action: nil, keyEquivalent: "")
+        let voicesMenu = NSMenu(title: "Voices")
+        for character in controller?.characters ?? [] {
+            let item = NSMenuItem(title: character.name, action: nil, keyEquivalent: "")
+            item.submenu = character.voiceSettings.makeMenu()
+            voicesMenu.addItem(item)
+        }
+        voicesItem.submenu = voicesMenu
+        menu.addItem(voicesItem)
+
         let loginItem = NSMenuItem(title: "Launch at Login", action: #selector(toggleLaunchAtLogin(_:)), keyEquivalent: "")
         loginItem.state = launchesAtLogin ? .on : .off
         menu.addItem(loginItem)
@@ -269,6 +279,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 
     @objc func toggleSounds(_ sender: NSMenuItem) {
         WalkerCharacter.soundsEnabled.toggle()
+        if !WalkerCharacter.soundsEnabled { CharacterVoice.stopPreview() }
         sender.state = WalkerCharacter.soundsEnabled ? .on : .off
     }
 

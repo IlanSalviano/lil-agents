@@ -1,0 +1,37 @@
+{
+  "imageTool": "built-in image_gen",
+  "imagePrompt": "Use case: stylized-concept. Asset type: reference artwork for a tiny animated macOS Dock companion. Create a single full-body polished chibi 3D cartoon caricature inspired by Bill McDermott of ServiceNow: distinctive swept-back silver gray hair, black rectangular sunglasses, long friendly face with broad confident smile, navy tailored suit, open collar white shirt no tie, black dress shoes. Charismatic enthusiastic business keynote speaker personality. Large head, small body, premium toy-like rendering matching cute anime desktop companions. Standing neutral ready pose with two relaxed arms separated slightly from torso, feet visible, facing three-quarter right. Entire character centered within middle 60 percent height of a portrait canvas, generous empty margin all sides for future raised arm gestures. Solid perfectly flat vivid magenta #ff00ff background for video chroma key, no floor or cast shadow. Even lighting. Exactly one character, two arms, two legs, no text, no logos, no objects, no watermark.",
+  "reference": "bill-reference.png",
+  "inspiration": "https://www.servicenow.com/company/executive-team/bill-mcdermott.html",
+  "voice": "Generic macOS English Eddy voice when available, male en-US fallback; no voice cloning.",
+  "videoTool": "Existing GrokVideoClient, official xAI image-to-video API",
+  "videoModel": "grok-imagine-video",
+  "sourcePrompts": "scripts/bill-prompts.json",
+  "videos": {
+    "special-bill-ai-01": {
+      "request_id": "6a37826e-1af1-9a17-9ece-2290062ea47e",
+      "model": "grok-imagine-video",
+      "duration": 10,
+      "resolution": "720p",
+      "status": "downloaded"
+    },
+    "special-bill-letsgo-01": {
+      "request_id": "2f211798-6085-9746-9e7f-916179190a0a",
+      "model": "grok-imagine-video",
+      "duration": 10,
+      "resolution": "720p",
+      "status": "downloaded"
+    },
+    "walk-bill-01": {
+      "request_id": "7bc73c05-7399-90b4-a585-613fc318caf8",
+      "model": "grok-imagine-video",
+      "duration": 10,
+      "resolution": "720p",
+      "status": "downloaded"
+    }
+  },
+  "editing": {
+    "special-bill-letsgo-01": "Keep first 5.75 seconds including recovery, then hold the neutral final pose to 10s; omit unintended second fist raise.",
+    "all": "240 frames at 24fps, magenta key, per-frame shoe calibration, native HEVC with alpha."
+  }
+}
