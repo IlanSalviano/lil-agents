@@ -5,12 +5,14 @@
     <key>LSUIElement</key>
     <true/>
     <key>SUFeedURL</key>
-    <string>https://raw.githubusercontent.com/ryanstephen/lil-agents/main/appcast.xml</string>
+    <string>https://raw.githubusercontent.com/IlanSalviano/lilagents-releases/main/appcast.xml</string>
     <key>SUPublicEDKey</key>
-    <string>8QOCrY3j4crgz4iR5lmxyv+rA5vnqK6Qtd1XheMllP8=</string>
+    <string>1SqFiqWVf1OKz2G00cix/ZZgGOc830wpJ59eMnhh5a0=</string>
     <key>SUEnableAutomaticChecks</key>
     <true/>
     <key>SUAllowsAutomaticUpdates</key>
+    <true/>
+    <key>SUVerifyUpdateBeforeExtraction</key>
     <true/>
 </dict>
 </plist>

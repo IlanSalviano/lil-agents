@@ -1,0 +1,76 @@
+{
+  "version": "1.3.2",
+  "build": 9,
+  "file": "lil-agents-1.3.2-universal.dmg",
+  "sha256": "67705969c878cb3a0faa562ce3bf39f4cdfc9fa94c659c2a6745fc1f72e2accc",
+  "bytes": 125813109,
+  "edSignature": "kE42/aJaA870u5LIvDjoVYTAUd7IM6KYS6D7K5F+Lu4Og0fUdUUBLUD9htmokXyBNoc78aUn/+e27H1AULv3Dg==",
+  "downloadURL": "https://github.com/IlanSalviano/lilagents-releases/releases/download/v1.3.2/lil-agents-1.3.2-universal.dmg",
+  "feedURL": "https://raw.githubusercontent.com/IlanSalviano/lilagents-releases/main/appcast.xml",
+  "notarized": true,
+  "architectures": {
+    "Contents/MacOS/lil agents": [
+      "x86_64",
+      "arm64"
+    ],
+    "Contents/Frameworks/Sparkle.framework/Versions/B/Autoupdate": [
+      "x86_64",
+      "arm64"
+    ],
+    "Contents/Frameworks/Sparkle.framework/Versions/B/Sparkle": [
+      "x86_64",
+      "arm64"
+    ],
+    "Contents/Frameworks/Sparkle.framework/Versions/B/Updater.app/Contents/MacOS/Updater": [
+      "x86_64",
+      "arm64"
+    ],
+    "Contents/Frameworks/Sparkle.framework/Versions/B/XPCServices/Downloader.xpc/Contents/MacOS/Downloader": [
+      "x86_64",
+      "arm64"
+    ],
+    "Contents/Frameworks/Sparkle.framework/Versions/B/XPCServices/Installer.xpc/Contents/MacOS/Installer": [
+      "x86_64",
+      "arm64"
+    ]
+  },
+  "verified": [
+    "Developer ID",
+    "Apple app ticket",
+    "Apple DMG ticket",
+    "Gatekeeper",
+    "mounted resources",
+    "universal binaries",
+    "Sparkle signature",
+    "appcast build"
+  ],
+  "validation": {
+    "voiceCatalog": {
+      "standard": 180,
+      "enhanced": 2,
+      "premium": 0
+    },
+    "nativeSpeechVoices": [
+      "Luciana (Enhanced)",
+      "Felipe (Enhanced)",
+      "Samantha (Standard)"
+    ],
+    "voiceMenus": 8,
+    "assetTests": 11,
+    "feedTests": 5,
+    "swiftRegressionSuites": [
+      "DockVisibility",
+      "CharacterAnimationLayout",
+      "CharacterPersonality"
+    ],
+    "premiumAudio": "Not tested: no Premium voice installed"
+  },
+  "publication": {
+    "remoteChecksumVerified": true,
+    "feedPublished": true,
+    "sparkleOfferedVersion": "1.3.2",
+    "sparkleOfferedBuild": "9",
+    "baseline": "Installed app 1.3.1 (8)",
+    "mode": "Information-only check; did not install update"
+  }
+}

@@ -1,6 +1,7 @@
 import SwiftUI
 import AppKit
 import Sparkle
+import ServiceManagement
 
 @main
 struct LilAgentsApp: App {
@@ -20,7 +21,44 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         NSApp.setActivationPolicy(.accessory)
         controller = LilAgentsController()
         controller?.start()
+        enableLaunchAtLoginOnFirstRun()
         setupMenuBar()
+    }
+
+    // MARK: - Launch at Login
+
+    private static let launchAtLoginConfiguredKey = "launchAtLoginConfigured"
+
+    /// Register as a login item once; afterwards the menu toggle (or System Settings) owns it.
+    private func enableLaunchAtLoginOnFirstRun() {
+        guard !UserDefaults.standard.bool(forKey: Self.launchAtLoginConfiguredKey) else { return }
+        do {
+            try SMAppService.mainApp.register()
+            UserDefaults.standard.set(true, forKey: Self.launchAtLoginConfiguredKey)
+        } catch {
+            print("Launch at login registration failed: \(error)")
+        }
+    }
+
+    private var launchesAtLogin: Bool {
+        SMAppService.mainApp.status == .enabled
+    }
+
+    @objc func toggleLaunchAtLogin(_ sender: NSMenuItem) {
+        do {
+            if launchesAtLogin {
+                try SMAppService.mainApp.unregister()
+            } else {
+                try SMAppService.mainApp.register()
+            }
+            UserDefaults.standard.set(true, forKey: Self.launchAtLoginConfiguredKey)
+        } catch {
+            print("Launch at login toggle failed: \(error)")
+            if SMAppService.mainApp.status == .requiresApproval {
+                SMAppService.openSystemSettingsLoginItems()
+            }
+        }
+        sender.state = launchesAtLogin ? .on : .off
     }
 
     func applicationWillTerminate(_ notification: Notification) {
@@ -37,19 +75,35 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 
         let menu = NSMenu()
 
-        let char1Item = NSMenuItem(title: "Bruce", action: #selector(toggleChar1), keyEquivalent: "1")
-        char1Item.state = .on
-        menu.addItem(char1Item)
-
-        let char2Item = NSMenuItem(title: "Jazz", action: #selector(toggleChar2), keyEquivalent: "2")
-        char2Item.state = .on
-        menu.addItem(char2Item)
+        if let chars = controller?.characters {
+            for (i, char) in chars.enumerated() {
+                let key = i < 9 ? "\(i + 1)" : ""
+                let item = NSMenuItem(title: char.name, action: #selector(toggleCharacter(_:)), keyEquivalent: key)
+                item.tag = i
+                item.state = char.isManuallyVisible ? .on : .off
+                menu.addItem(item)
+            }
+        }
 
         menu.addItem(NSMenuItem.separator())
 
         let soundItem = NSMenuItem(title: "Sounds", action: #selector(toggleSounds(_:)), keyEquivalent: "")
         soundItem.state = .on
         menu.addItem(soundItem)
+
+        let voicesItem = NSMenuItem(title: "Voices", action: nil, keyEquivalent: "")
+        let voicesMenu = NSMenu(title: "Voices")
+        for character in controller?.characters ?? [] {
+            let item = NSMenuItem(title: character.name, action: nil, keyEquivalent: "")
+            item.submenu = character.voiceSettings.makeMenu()
+            voicesMenu.addItem(item)
+        }
+        voicesItem.submenu = voicesMenu
+        menu.addItem(voicesItem)
+
+        let loginItem = NSMenuItem(title: "Launch at Login", action: #selector(toggleLaunchAtLogin(_:)), keyEquivalent: "")
+        loginItem.state = launchesAtLogin ? .on : .off
+        menu.addItem(loginItem)
 
         // Provider submenu (applies to all characters)
         let providerItem = NSMenuItem(title: "Provider", action: nil, keyEquivalent: "")
@@ -152,7 +206,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             if wasOpen {
                 char.createPopoverWindow()
                 if let session = char.session, !session.history.isEmpty {
-                    char.terminalView?.replayHistory(session.history)
+                    char.terminalView?.replayHistory(char.visibleHistory)
                 }
                 char.updatePopoverPosition()
                 char.popoverWindow?.orderFrontRegardless()
@@ -215,32 +269,17 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         }
     }
 
-    @objc func toggleChar1(_ sender: NSMenuItem) {
-        guard let chars = controller?.characters, chars.count > 0 else { return }
-        let char = chars[0]
-        if char.isManuallyVisible {
-            char.setManuallyVisible(false)
-            sender.state = .off
-        } else {
-            char.setManuallyVisible(true)
-            sender.state = .on
-        }
-    }
-
-    @objc func toggleChar2(_ sender: NSMenuItem) {
-        guard let chars = controller?.characters, chars.count > 1 else { return }
-        let char = chars[1]
-        if char.isManuallyVisible {
-            char.setManuallyVisible(false)
-            sender.state = .off
-        } else {
-            char.setManuallyVisible(true)
-            sender.state = .on
-        }
+    @objc func toggleCharacter(_ sender: NSMenuItem) {
+        guard let chars = controller?.characters, sender.tag >= 0, sender.tag < chars.count else { return }
+        let char = chars[sender.tag]
+        let visible = !char.isManuallyVisible
+        char.setManuallyVisible(visible)
+        sender.state = visible ? .on : .off
     }
 
     @objc func toggleSounds(_ sender: NSMenuItem) {
         WalkerCharacter.soundsEnabled.toggle()
+        if !WalkerCharacter.soundsEnabled { CharacterVoice.stopPreview() }
         sender.state = WalkerCharacter.soundsEnabled ? .on : .off
     }
 

@@ -1,0 +1,106 @@
+{
+  "imageTool": "built-in imagegen",
+  "imageSource": "tanjiro-reference.png",
+  "imagePrompt": "Use case: stylized-concept. Asset type: source artwork for a chibi animated macOS Dock companion. Create ONE chibi anime swordsman strongly resembling Tanjiro Kamado from Demon Slayer: tousled dark burgundy hair with reddish tips, kind large reddish-brown eyes, forehead scar, white rectangular hanafuda earrings, green-and-black checkered haori over a charcoal buttoned uniform, white belt, loose charcoal trousers, white calf wraps, dark brown sandals with clearly visible soles. ONE black katana with subtle silver cutting edge in his right hand, held low and diagonally forward to the RIGHT, blade tip fully visible and safely ABOVE the sandals. No scabbard, backpack or box. Friendly compassionate expression with quiet determined confidence. High-quality hand-drawn 2D anime cel shading, clean dark outlines, approximately 3.3 heads tall to match other chibi companions. Full body in RIGHT-FACING three-quarter side profile, relaxed ready-to-walk stance, both sandals on one invisible ground line. Portrait 9:16 canvas. Character body height 64% of canvas, centered horizontally, hair top at 18% and soles at 82%, ample room on all sides for sword motion. Fixed orthographic camera. Absolutely uniform flat vivid chroma MAGENTA #FF00FF background: no gradients, floor, shadow, bloom, scenery, text, watermark or labels. No magenta anywhere on character. Exactly two arms, two legs, one sword, one character. Nothing cropped.",
+  "videoPrompts": "../../scripts/tanjiro-prompts.json",
+  "status": "validated",
+  "xaiAttempt": {
+    "status": "authentication_rejected_before_job_creation",
+    "httpStatus": 403,
+    "errorCode": "unauthenticated:bad-credentials",
+    "error": "The OAuth2 access token could not be validated.",
+    "clipsGenerated": 0
+  },
+  "elevenlabsPreparation": {
+    "flowId": "hvNHZPBVp0VU0zmakktD",
+    "referenceNode": "HS9tAmcJRC1T4DBKKCJB",
+    "nodes": {
+      "walk-tanjiro-01": "tbfW0uzHizDaDzASWTFp",
+      "special-tanjiro-water-01": "1EK60v56zLtQLjugztnI",
+      "special-tanjiro-hinokami-01": "IeYjdMbLLOkq23WKWkL3"
+    },
+    "model": "kling-3-pro",
+    "status": "prepared_only_no_generation_started"
+  },
+  "videoClient": "scripts/generate_tanjiro.py via GrokVideoClient",
+  "videoModel": "grok-imagine-video",
+  "clips": {
+    "special-tanjiro-water-01": {
+      "request_id": "bd84a956-8828-95d4-92d1-e0a9c1db61fc",
+      "model": "grok-imagine-video",
+      "duration": 10,
+      "resolution": "720p",
+      "status": "downloaded",
+      "sourceSha256": "d269501bdfae3a7752d6b29380ded5968bc6783619313682593325d247d95d34"
+    },
+    "walk-tanjiro-01": {
+      "request_id": "9130a174-f2b7-94d0-b968-0b70a4e70f59",
+      "model": "grok-imagine-video",
+      "duration": 10,
+      "resolution": "720p",
+      "status": "downloaded",
+      "sourceSha256": "e966eb561e315493980aec991f9217493e79bc1b05fd40949469fe8c54dd82ca"
+    },
+    "special-tanjiro-water-01-v2": {
+      "request_id": "06366be0-edc0-97ad-952d-ef60eb7a2bf9",
+      "model": "grok-imagine-video",
+      "duration": 10,
+      "resolution": "720p",
+      "status": "downloaded",
+      "sourceSha256": "6835090f841c26245ad7dda3f6cc11328d59ba6cbab058194bdeebce6363bae1"
+    },
+    "special-tanjiro-hinokami-01-v2": {
+      "request_id": "d126f418-1e28-9607-ba28-0cabb031f05c",
+      "model": "grok-imagine-video",
+      "duration": 10,
+      "resolution": "720p",
+      "status": "downloaded",
+      "sourceSha256": "7d90219a9949537afaa02c6661a8ada84706afef7c1d4e1da021f92beca19f8a"
+    },
+    "walk-tanjiro-01-v2": {
+      "request_id": "47ef09a8-f4c5-996d-8dd4-9b8ea5845abf",
+      "model": "grok-imagine-video",
+      "duration": 10,
+      "resolution": "720p",
+      "status": "downloaded",
+      "sourceSha256": "c1291234300367f5c7c1a0d5577b2455fb4be414fe21a8507de5bc8cc46dcf31"
+    },
+    "special-tanjiro-hinokami-01": {
+      "request_id": "1da4ac25-5e74-971b-adef-8debbebe5b03",
+      "model": "grok-imagine-video",
+      "duration": 10,
+      "resolution": "720p",
+      "status": "downloaded",
+      "sourceSha256": "ddfa01c2e7b810a563caedc97086b1935af6af91ed395c3744ba2c5270fc44a4"
+    }
+  },
+  "rejectedSources": {
+    "special-tanjiro-water-01": "Sword tip leaves the frame during recovery; use revised take with wider margins.",
+    "special-tanjiro-hinokami-01": "Fire arc is cropped at the top edge; use revised take with wider margins.",
+    "walk-tanjiro-01": "Native full-frame checks found the sword tip cropped at the right edge during several steps; replaced with wider-reference take."
+  },
+  "battleImageSource": "tanjiro-battle-reference.png",
+  "acceptedSources": {
+    "special-tanjiro-water-01": "special-tanjiro-water-01-v2",
+    "special-tanjiro-hinokami-01": "special-tanjiro-hinokami-01-v2",
+    "walk-tanjiro-01": "walk-tanjiro-01-v2"
+  },
+  "imageSha256": "554e75b4a21a6ae5ca2533502b9667cc40e3dabbb051d0561da8c57a6d5306fd",
+  "battleImageSha256": "04f70239969376ef3cac4c911a12eb62c0ad535963a5a3c05ffb06a803fc99e4",
+  "bundledAssetsSha256": {
+    "walk-tanjiro-01.mov": "d022a0b2b91fb47e25a635f71802780628934d4625f0fe5c3fbe64fcbe7ca96c",
+    "special-tanjiro-water-01.mov": "779aa1ca6a8e739433c8616b6a5d343eb41f8e786784d4f37089b3eb94a2ccd3",
+    "special-tanjiro-hinokami-01.mov": "6a9c4aa59204d7bb106754e4bc008640bed14aa4955e73b08c7353d0d2d52a33",
+    "tanjiro-animation-layouts.json": "3fb741374b3482180b452afc23db68f3254292ffda6afebeb7a53f82b6380f6f"
+  },
+  "validation": {
+    "nativeDecodedFrames": 723,
+    "assetTests": "passed",
+    "swiftDockLayoutPersonalityTests": "passed",
+    "tanjiroRuntime": "passed",
+    "inosukeRuntime": "passed",
+    "xcodeBuild": "passed",
+    "sourceBundleHashes": "match",
+    "preview": "../../build/tanjiro/tanjiro-preview.gif"
+  }
+}
